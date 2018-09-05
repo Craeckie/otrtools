@@ -1,0 +1,4 @@
+appdirs==1.4.3
+Django==2.1
+pytz==2018.5
+urllib3==1.23
