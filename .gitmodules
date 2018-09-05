@@ -1,0 +1,3 @@
+[submodule "keyframe-list/ffms2"]
+	path = keyframe-list/ffms2
+	url = https://github.com/FFMS/ffms2.git

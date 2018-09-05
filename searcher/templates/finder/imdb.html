@@ -1,0 +1,35 @@
+<html>
+<head>
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  <base target="_blank">
+</head>
+<body>
+  <div class="container">
+    <table class="table table-striped">
+      {% for e in episodes %}
+        <tr>
+          <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a href="{{ e.url }}">{{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
+          {% if 'otr' in e %}
+            {% with e.otr as titles %}
+            <table class="table table-striped">
+            {% for t in titles %}
+              <tr>
+                <td><a href="https://otrkeyfinder.com/en/?search={{ t.title }}&order=date-name">{{ t.title }}</a></td>
+                <td>{{ t.length }}</td>
+                <td>{{ t.item_count }}</td>
+                <td><a href="https://www.imdb.com/find?q={{ t.title }}&s=all">IMDB</a></td>
+                <td><a href="https://www.youtube.com/results?search_query={{ t.title }} Trailer">Youtube Trailer</a></td>
+              </tr>
+            {% endfor %}
+            </table>
+            {% endwith %}
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+</body>
+</html>

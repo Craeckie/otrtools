@@ -19,5 +19,6 @@ import downloader.urls
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('search/', include('searcher.urls')),
     path('download/', include('downloader.urls')),
 ]
