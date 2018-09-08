@@ -13,7 +13,7 @@ wwwdir = settings.WWW_DIR
 #php_path = os.path.join(homedir, 'php/')
 # php_path = os.path.join('.', 'php/')
 
-temp_path = os.path.join(wwwdir, "temp/")
+temp_path = settings.CUT_DIR
 
 #regex_otrkey = re.compile("[A-Za-z0-9_-]+([0-9]{2}\.){2}[0-9]{2}_[0-9]{2}-[0-9]{2}_[A-Za-z0-9_]+\.[a-zA-Z4.]+\.otrkey")
 
@@ -81,7 +81,7 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
           requiresDownload = True
     if audio and os.path.exists(audio.get_decrypted(dest_path)):
       print("Audio already decrypted")
-    else:
+    elif audio:
       if add_download_list(listfile, audio.url, audio.get_decrypted(dest_path)):
           requiresDownload = True
 
@@ -111,7 +111,7 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     # os.chdir(dest_path)
 
     print("Starting cutting..")
-    if cut(video.get_decrypted(dest_path), cutlist, audio=audio.get_decrypted(dest_path) if audio else None):
+    if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None):
         if mega:
             if amazon_upload(dest):
                 print("Succesfully uploaded, removing video")

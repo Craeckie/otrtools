@@ -22,12 +22,16 @@ def get_codec(video):
       print("Codec not found for extension: %s!" % ext)
       return None
 
-def cut(encoder, video, concat_file, cut_params, transcode=False, meta_comment=None):
+def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, meta_comment=None):
   # if transcode:
   #   print("ok, will start transcoding from %s for %s frames" % (str(cut_params['start_frame']), str(cut_params['dur_frames'])))
   # else:
-  print("ok, will start cutting from %s for %s seconds" % (str(cut_params['start_fl']), str(cut_params['dur_fl'])))
-  video_name = "cut" + str(cut_params['index']) + "." + ext
+  # print("Cut_params: %s" % str(cut_params))
+  start = cut_params['start_fl']
+  duration = cut_params['dur_fl']
+  print(f"ok, will start cutting from {start} for {duration} seconds")
+  video_name = f"cut{cut_params['index']}.{ext}"
+  video_path = os.path.join(video_base, video_name)
 
 
   extra_flags = []
@@ -36,7 +40,7 @@ def cut(encoder, video, concat_file, cut_params, transcode=False, meta_comment=N
   args = [encoder, '-hide_banner']
   #   args += ['-noaccurate_seek']
   # if not transcode:
-  args += ['-ss', str(cut_params['start_fl'])]
+  args += ['-ss', str(start)]
 
   args += ['-fflags', '+genpts', '-i', video]
   if transcode:
@@ -46,19 +50,18 @@ def cut(encoder, video, concat_file, cut_params, transcode=False, meta_comment=N
     args += ['-c:v', 'copy']
   if meta_comment:
     args += ['-metadata', 'comment=' + meta_comment]
-  args += ['-t', str(cut_params['dur_fl']),
+  args += ['-t', str(duration),
            '-avoid_negative_ts', '1',
            '-c:a', 'copy',
            '-map', '0',
            '-avoid_negative_ts', '1',
-
-           '-y', video_name]
+           '-y', video_path]
   print("Arguments: %s" % str(args))
   if subprocess.call(args) != 0:
-      print("Call of ffmeg failed! Exiting.")
-      sys.exit(1)
-  concat_file.write("file '%s'\n" % video_name)
-  return video_name
+      print("Running ffmpeg failed!")
+      return None
+  concat_file.write(f"file '{video_name}'\n")
+  return video_path
 
 class KeyframeResult(Enum):
   isKeyFrame = 1
@@ -140,69 +143,37 @@ def find_keyframe(keyframe_list, cut_params):
   result['type'] = KeyframeResult.endOfFile
   return result
 
-  # Search for keyframe after timestamp(390):
-  # ffprobe -read_intervals "390%+20" -print_format json -select_streams v -noprivate -show_entries 'frame=key_frame,best_effort_timestamp_time' movie.avi
-  # | jq -C '[.frames[] | select(.key_frame == 1) | .best_effort_timestamp_time | tonumber | select(.>=390)] | min'
-  # print("Searching for keyframe before " + str(start))
-  # start_offset = 10
-  # start_cur = start - start_offset
-  # cmd=prober + ' -select_streams v -read_intervals ' + str(start_cur) + '%+' + str(start_offset) + ' -show_frames ' + video
-  # print("CMD: " + cmd)
-  # p = subprocess.Popen(cmd,
-  #                   shell=True,
-  #                   bufsize=64,
-  #                   stdin=subprocess.PIPE,
-  #                   stderr=subprocess.PIPE,
-  #                   stdout=subprocess.PIPE)
-  #
-  # pos=''
-  # keyframe='0'
-  # cur_last_kf=''
-  # for line in p.stdout:
-  #   tmp = str(line.rstrip())
-  #   if tmp.startswith("b'key_frame="):
-  #     keyframe = tmp[len("b'key_frame="):len(tmp) - 1]
-  #   if tmp.startswith("b'pkt_dts_time="):
-  #     pos = tmp[len("b'pkt_dts_time="):len(tmp) - 1]
-  #     if float(pos) > start_cur + start_offset:
-  #       print("killing ffprobe")
-  #       p.kill()
-  #   if keyframe != '0' and "b'[/FRAME]" in tmp:
-  #     print(pos)
-  #     cur_last_kf = pos
-  #     pos = ''
-  #     keyframe='0'
-  #
-  # return float(cur_last_kf)
-
-def cut_section(encoder, video, keyframe_list, concat_file, cur_cut, meta_comment=None):
+def cut_section(encoder, video, video_base, keyframe_list, concat_file, cur_cut, meta_comment=None):
   kf_result = find_keyframe(keyframe_list, cur_cut)
   if kf_result['type'] == KeyframeResult.found:
     # kf_cut = cur_cut
     pre_cut = kf_result['pre_cut_params']
     pre_cut['index'] = '%sa' % cur_cut['index']
-    video_name = cut(encoder, video, concat_file, pre_cut, transcode=True, meta_comment=meta_comment)
+    video_path = cut(encoder, video, video_base, concat_file, pre_cut, transcode=True, meta_comment=meta_comment)
+    if not video_path:
+      return None
     cur_cut = kf_result['next_cut']
   elif kf_result['type'] == KeyframeResult.isKeyFrame:
     cur_cut = kf_result['next_cut']
 
-  video_name = cut(encoder, video, concat_file, cur_cut, meta_comment)
-  return video_name
+  video_path = cut(encoder, video, video_base, concat_file, cur_cut, transcode=False, meta_comment=meta_comment)
+  return video_path
 
-def use_cutlist(encoder, cutlist, video, keyframe_list, meta_comment=None):
-    print("Openening cutlist at " + cutlist)
-    cut_file = open(cutlist, 'r', encoding = "ISO-8859-1")
-    concat_file = open("concat_list.txt", 'w');
+def cut_video(encoder, cutlist, video, video_base, keyframe_list, meta_comment=None):
+    # print("Openening cutlist at " + cutlist)
+    # cut_file = open(cutlist, 'r', encoding = "ISO-8859-1")
+    concat_list_path = os.path.join(video_base, "concat_list.txt")
+    concat_file = open(concat_list_path, 'w');
 
     i = -1
     start=''
     dur = ''
     cut_files=[]
-    cut_text = cut_file.read()
+    # cut_text = cut_file.read()
     success = False
     cur_cut = {}
 
-    for cut_line in cut_text.split('\n'):
+    for cut_line in cutlist.split('\n'):
       #cut_line = re.sub("[^A-Za-z0-9._=\[\]-]+", '', cut_line);
       cut_line = cut_line.rstrip()
       #print(cut_line.encode('utf-8').strip())
@@ -211,8 +182,10 @@ def use_cutlist(encoder, cutlist, video, keyframe_list, meta_comment=None):
         if i >= 0 and 'start_fl' in cur_cut and 'dur_fl' in cur_cut:
           # section is finished, need to cut here
           cur_cut['index'] = i
-          video_name = cut_section(encoder, video, keyframe_list, concat_file, cur_cut, meta_comment)
-          cut_files.append(video_name)
+          video_path = cut_section(encoder, video, video_base, keyframe_list, concat_file, cur_cut, meta_comment)
+          if not video_path:
+              return (None, concat_list_path)
+          cut_files.append(video_path)
           success = True
         i = int(cut_start_match.group(1));
         print("\n---\nCut section " + str(i) +" starts\n---\n")
@@ -241,16 +214,17 @@ def use_cutlist(encoder, cutlist, video, keyframe_list, meta_comment=None):
     if i >= 0 and 'start_fl' in cur_cut and 'dur_fl' in cur_cut:
       # section is finished, need to cut here
       cur_cut['index'] = i
-      video_name = cut_section(encoder, video, keyframe_list, concat_file, cur_cut, meta_comment)
-      cut_files.append(video_name)
+      video_path = cut_section(encoder, video, video_base, keyframe_list, concat_file, cur_cut, meta_comment)
+      if not video_path:
+          return (None, concat_list_path)
+      cut_files.append(video_path)
       success = True
-    cut_file.close()
 
     if success: # at least one cut found
       concat_file.close()
 
 
-    return cut_files
+    return (cut_files, concat_list_path)
 
 def parse_media_name(filename):
     #Southpaw_17.10.10_21-00_ukfilm4_145_TVOON_DE.mpg.HD.avi
@@ -260,13 +234,20 @@ def parse_base_name(filename):
     basename_match = re.search('(?P<name>[a-zA-Z0-9_-]+_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9A-Za-z-]+_[0-9]+_TVOON_DE)(?P<extension>[A-Za-z0-9.]+)$', filename)
     return basename_match
 
-def get_real_name(filename):
-    dest_path = filename + ext
+def get_real_name(filename, extension):
+    dest_path = filename + extension
     filename_match = parse_media_name(filename)
     if filename_match:
       temp_filename = filename_match.group('name')
       actual_filename = re.sub('_', ' ', temp_filename)
-      dest_path = actual_filename + '.' + ext #os.path.splitext(video)[0] + ".cut.avi"
+
+      sender = filename_match.group("sender")
+
+      if sender.startswith("uk") or sender.startswith("us"):
+          actual_filename += " (engl)"
+          print("Is english, new name: %s" % actual_filename)
+
+      dest_path = actual_filename + '.' + extension #os.path.splitext(video)[0] + ".cut.avi"
     else:
       print("Could not parse OTR-standard filename")
     return dest_path

@@ -37,7 +37,7 @@ def index(request):
         'titles': grouped,
         'search': q
     }
-    return render(request, 'finder/index.html', ctx)
+    return render(request, 'searcher/index.html', ctx)
 
 def imdb_index(request):
     url = request.GET.get('url')
@@ -67,4 +67,4 @@ def imdb_index(request):
         'episodes': episodes,
         'search': q
     }
-    return render(request, 'finder/imdb.html', ctx)
+    return render(request, 'searcher/imdb.html', ctx)

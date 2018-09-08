@@ -1,11 +1,10 @@
 #!/usr/bin/python3
 #from sys import argv
 import argparse
-import re
-import subprocess, os, shutil, sys
+import re, subprocess, os, shutil, sys, traceback
 from urllib3 import util as url_util
 from .decrypt import decrypt
-from .cut_util import cut, use_cutlist, get_real_name
+from .cut_util import cut, cut_video, get_real_name, parse_media_name
 from django.conf import settings
 from .merge import merge
 from .download_util import amazon_upload
@@ -13,116 +12,104 @@ from .cutlist import get_cutlist
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
-def cut(video, cutlist, video_base, audio=None):
+def cut(video, cutlist_path, video_base, audio=None):
+    if not os.path.exists(video_base):
+      os.mkdir(video_base)
+    cutlist = get_cutlist(cutlist_path)
+
+    video_info = parse_media_name(video).groups()
+    if not video_info:
+      print("Couldn't parse OTR video name!")
+      return None
+
     # If audio file passed, merge it with video
     if audio:
-      tmp_merge_name = "merge." + settings.CUT_EXT
+      tmp_merge_name = os.path.join(video_base, "merge." + settings.CUT_EXT)
       if not merge(video, audio, tmp_merge_name):
           return False
-      print("Removing video(" + video + ") and audio(" + audio + ")")
+      print(f"Removing video{video}) and audio({audio})")
       os.remove(video)
       os.remove(audio)
-      video = os.path.splitext(video)[0] + "." + settings.CUT_EXT
-      print("Moving merged video(" + tmp_merge_name + "->" + video)
-      os.rename(tmp_merge_name, video)
+      print(f"Using merge ({merge}) as video")
+      video = merge
+      # video = os.path.splitext(video)[0] + "." + settings.CUT_EXT
+      # print("Moving merged video(" + tmp_merge_name + "->" + video)
+      # os.rename(tmp_merge_name, video)
 
     # Get list of key frames
     print("Searching all keyframes..")
 
-    res = subprocess.check_output(["keyframe-list", video])
+    res = subprocess.check_output([settings.CUT_KEYFRAME_LISTER, video])
 
     keyframe_list = res.decode("UTF-8").splitlines()
     # else:
     #   keyframe_list = []
     #   print("Could not retrieve list of key frames!\nNo key frame accurate cutting possible :()")
 
-    meta_comment = "Video: " + video + " \nCutlist: " + cutlist
+    meta_comment = "Video: " + video + " \nCutlist:\n" + cutlist
     # The cutting into pieces
-    cut_files = use_cutlist(settings.CUT_ENCODER, cutlist, video, keyframe_list, meta_comment)
+    cut_files = None
+    try:
+        (cut_files, concat_list_path) = cut_video(settings.CUT_ENCODER, cutlist, video, video_base, keyframe_list, meta_comment)
+    except Exception as e:
+        print(f"Cutting failed!")
+        traceback.print_exc()
 
-    if len(cut_files) == 0: # No cut in cutlist
-      print("Error: No cuts found in cutlist!")
-      return False
-    dest_path = os.path.abspath("../" + get_real_name(video))
+    dest_path = None
+    if cut_files:
+        if len(cut_files) == 0: # No cut in cutlist
+          print("Error: No cuts found in cutlist!")
+          return False
+        if not os.path.exists(settings.DEST_DIR):
+          os.mkdir(settings.DEST_DIR)
+        dest_path = os.path.abspath(os.path.join(settings.DEST_DIR, get_real_name(video, settings.DEST_EXT)))
 
-    print("Saving to \"" + dest_path + "\"")
-    if len(cut_files) > 1:
-      # concatenate the cuts
-      extra_flags = []
-      if video.endswith(".avi"):
-        extra_flags = ["-fflags", "+genpts"]
-      args = [settings.CUT_ENCODER,
-        '-hide_banner',
-        '-f', 'concat'] + extra_flags + ['-i', "concat_list.txt",
-        '-c:v', 'copy',
-        '-c:a', 'copy',
-        '-map', '0',
-        '-metadata', 'comment=' + meta_comment,
-        '-y', dest_path]
-      print("Arguments: %s" % str(args))
-      res = subprocess.call(args);
+        print(f'Saving to "{dest_path}"')
+        if len(cut_files) > 1:
+          # concatenate the cuts
+          extra_flags = []
+          if video.endswith(".avi"):
+            extra_flags += ["-fflags", "+genpts"]
+          if video_info and \
+             settings.CUT_EXT == "mkv" and \
+             any(ext in video_info['extension'] for ext in ('HQ', 'HD')):
 
-      if res != 0:
-        print("Concatenation failed!")
-        return False
-      video = dest_path
+                print("Converting with h264_mp4toannexb")
+                extra_flags += ['-bsf:v', 'h264_mp4toannexb']
+          args = [settings.CUT_ENCODER,
+            '-hide_banner',
+            '-f', 'concat'] + extra_flags + ['-i', concat_list_path,
+            '-c:v', 'copy',
+            '-c:a', 'copy',
+            '-map', '0',
+            '-metadata', 'comment=' + meta_comment,
+            '-y', dest_path]
+          print("Arguments: %s" % str(args))
+          res = subprocess.call(args);
 
-      # os.remove("concat_list.txt")
+          if res != 0:
+            print("Concatenation failed!")
+            return False
 
-      # Remove cut files
-      # for cur_cut_file in cut_files:
-      #   print("Removing " + cur_cut_file)
-      #   os.remove(cur_cut_file)
+          os.remove(concat_list_path)
 
-    elif len(cut_files) == 1:
-      print("Only one cut, just moving cut file")
-      os.rename(cut_files[0], dest_path)
+          # Remove cut files
+          # for cur_cut_file in cut_files:
+          #   print("Removing " + cur_cut_file)
+          #   os.remove(cur_cut_file)
 
+        elif len(cut_files) == 1:
+          print("Only one cut, just moving cut file")
+          os.rename(cut_files[0], dest_path)
 
-    if downl_cutlist:
-      print("Removing cutlist at " + cutlist)
-      os.remove(cutlist)
-
-    os.chdir("..")
+        # Fix permissions?
+        # shutil.chown(dest_path, user="www-data", group="www-data")
+    else:
+        print("Cutting failed!")
+    # os.chdir("..")
     print("Removing video base at " + os.path.abspath(video_base))
     shutil.rmtree(video_base)
-    sender_extension_match = re.search("[A-Za-z0-9_-]+_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_([A-Za-z0-9]+)_[0-9]+_TVOON_[A-Z]+\.(.*)$", os.path.basename(video_base))
 
-    extension = "mpg.avi"
-    if sender_extension_match:
-        (filename, ext) =  os.path.splitext(os.path.basename(dest_path))
-        dest_path = "%s.avi" % filename
-        sender = sender_extension_match.group(1)
-        extension = sender_extension_match.group(2)
-        print("Sender: %s, Extension: %s" % (sender, extension))
-        if sender.startswith("uk") or sender.startswith("us"):
-            dest_path = "%s (engl).avi" % filename
-            print("Is english, new name: %s" % dest_path)
-
-    if ext == "mkv":
-      extra_flags = []
-      if any(ext in extension for ext in ('HQ', 'HD')):
-          print("Converting with h264_mp4toannexb")
-          extra_flags = ['-bsf:v', 'h264_mp4toannexb']
-
-      args = [settings.CUT_ENCODER, '-hide_banner', '-i', video,
-        '-c:v', 'copy',
-        '-c:a', 'copy',
-        '-map', '0'] + extra_flags + ['-y', dest_path]
-      print("Arguments: %s" % str(args))
-      res = subprocess.call(args);
-
-      if res != 0:
-        print("Conversion mkv -> avi failed!")
-        return False
-
-      os.remove(video)
-    else:
-      os.rename(video, dest_path)
-      video = dest_path
-
-    # Fix permission
-    shutil.chown(dest_path, user="www-data", group="www-data")
     return dest_path
 
 if __name__ == 'main':
@@ -192,13 +179,10 @@ if __name__ == 'main':
         else:
             os.rename(old_audio_path, audio)
 
-    (cutlist, isDownloaded) = get_cutlist(args.cutlist)
-
-    os.chdir(video_base)
+    # os.chdir(video_base)
 
     dest = cut(video, cutlist, video_base, audio)
-    if isDownloaded:
-        os.remove(cutlist)
+
     if dest:
         if args.mega:
             mega_path = "--path=" + os.environ['mega_path']

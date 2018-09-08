@@ -55,7 +55,7 @@ ROOT_URLCONF = 'otrtools.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['searcher/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,9 +122,18 @@ STATIC_URL = '/static/'
 
 WWW_DIR = 'www/'
 
+# Decryption
+OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
+
+# Cutting
 CUT_ENCODER = "ffmpeg"
-CUT_PROBER = "ffprobe"
-CUT_EXT = "avi"
+CUT_KEYFRAME_LISTER = "keyframe-list"
+CUT_EXT = "avi" # might work better with mkv
+CUT_DIR = os.path.join(WWW_DIR, 'temp')
+
+# Saving video files
+DEST_DIR = os.path.join(WWW_DIR, 'videos')
+DEST_EXT = "avi"
 
 # Production settings (keep at the end)
 PRODUCTION_SETTINGS_PATH=os.path.join(os.path.dirname(__file__), "production.py")

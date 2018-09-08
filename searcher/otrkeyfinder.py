@@ -4,6 +4,7 @@ from datetime import timedelta
 from multiprocessing.dummy import Pool
 from functools import lru_cache
 from itertools import chain, repeat
+from django.conf import settings
 
 class Title:
     def __init__(self, title, length, items, isSimilarDecoded):
@@ -19,9 +20,11 @@ sortkeyfn = lambda t:t['title']
 
 @lru_cache(maxsize=1)
 def loadKeys():
-    path = "otrkey_cache"
+    path = settings.OTRKEY_CACHE
     keys = []
+    names = set()
     if os.path.exists(path):
+        print(f"Importing keys from {path}")
         with open(path, 'r') as f:
           lines = f.readlines()
           keys = set(
@@ -29,7 +32,6 @@ def loadKeys():
             for l in lines
             if '#' in l
           )
-          names = set()
           for key in keys:
             m = re.search('(?P<name>[a-zA-Z0-9_-]+)_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9A-Za-z-]+_[0-9]+_TVOON_DE[A-Za-z0-9.]+$', key)
             if m:

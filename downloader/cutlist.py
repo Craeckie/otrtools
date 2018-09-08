@@ -1,17 +1,24 @@
 import os
 from urllib import parse, request
 
-def get_cutlist(cutlist):
-    # Get the cutlist
-    isDownloaded = False
-    cutlist_url = parse.urlparse(cutlist)
+def get_cutlist(path):
+    # isDownloaded = False
+    cutlist_url = parse.urlparse(path)
+    cutlist = None
     if cutlist_url.scheme == 'http':
-      file = request.urlopen(cutlist)
-      cutlist = os.path.join(video_base, 'cur_cutlist.cutlist')
-      output = open(cutlist, 'wb')
-      output.write(file.read())
-      output.close()
-      isDownloaded = True
+      file = request.urlopen(path)
+      cutlist = file.read()
+      # cutlist = os.path.join(video_base, 'cur_cutlist.cutlist')
+      # output = open(cutlist, 'wb')
+
+      # output.write(file.read())
+      # output.close()
+      # isDownloaded = True
     else:
-      cutlist = os.path.realpath(cutlist)
-    return (cutlist, isDownloaded)
+        if os.path.exists(path):
+          with open(path, 'r', encoding = "ISO-8859-1") as f:
+            cutlist = f.read()
+        else:
+          raise Exception(f"Cutlist does not exists: {cutlist}!")
+      # cutlist = os.path.realpath(path)
+    return cutlist
