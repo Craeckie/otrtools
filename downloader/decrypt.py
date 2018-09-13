@@ -32,8 +32,9 @@ def decrypt(otrkey, dest):
     for line in iter(prc.stdout.readline, ""):
         if prc.poll() != None:
           break
-        text = line.decode().replace('\n', '')
-        print(text, end='\r')
+        # text = line.decode().replace('\n', '')
+        # print(text, end='\r')
+        print(line.decode(), end='')
     (std, err) = prc.communicate()
     print("")
     prc.stdout.close()

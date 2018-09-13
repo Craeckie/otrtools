@@ -76,13 +76,13 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
         print(f"audio.decrypted: {audio.get_decrypted(dest_path)}")
     if os.path.exists(video.get_decrypted(dest_path)):
         print("Video already decrypted")
-    else:
-      if add_download_list(listfile, video.url, video.get_decrypted(dest_path)):
+    elif not os.path.exists(video.get_otrkey(dest_path)):
+      if add_download_list(listfile, video.url, video.get_otrkey(dest_path)):
           requiresDownload = True
     if audio and os.path.exists(audio.get_decrypted(dest_path)):
       print("Audio already decrypted")
-    elif audio:
-      if add_download_list(listfile, audio.url, audio.get_decrypted(dest_path)):
+    elif audio and not os.path.exists(audio.get_otrkey(dest_path)):
+      if add_download_list(listfile, audio.url, audio.get_otrkey(dest_path)):
           requiresDownload = True
 
 
@@ -95,12 +95,12 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
 
         os.remove(listfile)
 
-        if not os.path.exists(video.get_decrypted(dest_path)):
-            if not decrypt(video.get_decrypted(dest_path), video.get_decrypted(dest_path)):
-              return False
-        if audio and not os.path.exists(audio.decrypted):
-            if not decrypt(audio.get_otrkey(dest_path), audio.get_decrypted(dest_path)):
-              return False
+    if not os.path.exists(video.get_decrypted(dest_path)):
+        if not decrypt(video.get_otrkey(dest_path), video.get_decrypted(dest_path)):
+          return False
+    if audio and not os.path.exists(audio.get_decrypted(dest_path)):
+        if not decrypt(audio.get_otrkey(dest_path), audio.get_decrypted(dest_path)):
+          return False
 
     #video_path = os.path.join(dest_path, video)
     #audio_path = None
