@@ -7,7 +7,7 @@ def get_cutlist(path):
     cutlist = None
     if cutlist_url.scheme == 'http':
       file = request.urlopen(path)
-      cutlist = file.read()
+      cutlist = file.read().decode('ISO-8859-1')
       # cutlist = os.path.join(video_base, 'cur_cutlist.cutlist')
       # output = open(cutlist, 'wb')
 
@@ -16,7 +16,7 @@ def get_cutlist(path):
       # isDownloaded = True
     else:
         if os.path.exists(path):
-          with open(path, 'r', encoding = "ISO-8859-1") as f:
+          with open(path, 'r', encoding = 'ISO-8859-1') as f:
             cutlist = f.read()
         else:
           raise Exception(f"Cutlist does not exists: {cutlist}!")
