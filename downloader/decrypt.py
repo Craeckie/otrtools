@@ -22,6 +22,7 @@ def decrypt(otrkey, dest):
       "otrtool",
       "-fx",
       '-u', # remove otrkey after decryption
+      '-C', settings.OTRKEY_CACHE,
       '-O', dest,
       "-e", settings.OTR_USERNAME,
       "-p", settings.OTR_PASSWORD,

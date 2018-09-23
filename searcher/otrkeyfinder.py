@@ -65,6 +65,13 @@ def _getFiles(p, search):
         files = [s.string for s in spans]
     return files
 
+format_name = {
+  'mpg.mp4' : 'MP4',
+  'mpg.avi' : 'AVI',
+  'mpg.HQ.avi' : 'HQ',
+  'mpg.HD.avi' : 'HD',
+  'mpg.HD.ac3' : 'AC3',
+}
 
 def parsePage(p, search, min_dur, key_names):
     titles = []
@@ -79,17 +86,18 @@ def parsePage(p, search, min_dur, key_names):
         #print(time)
         if time >= timedelta(minutes=min_dur):
           title = m.group('title')
+          format = m.group('format')
+          if format in format_name:
+              format = format_name[format]
           isDecoded = f.replace('.otrkey', '') in keys
           isSimilarDecoded = title in names
-          if 'Ziemlich' in title:
-            print(title)
-            print(isSimilarDecoded)
 
           #print(f"File: '{f}', isDecoded: {isDecoded}")
           titles.append({
             'title': title.replace('_', ' '),
             'length': time,
             'file': f,
+            'format': format,
             'isDecoded': isDecoded,
             'isSimilarDecoded': isSimilarDecoded
             })

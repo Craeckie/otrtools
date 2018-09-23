@@ -1,3 +1,4 @@
+{% load imdb_tags %}
 <html>
 <head>
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
@@ -17,7 +18,7 @@
             <table class="table table-striped">
             {% for t in titles %}
               <tr>
-                <td><a href="https://otrkeyfinder.com/en/?search={{ t.title }}&order=date-name">{{ t.title }}</a></td>
+                <td><a href="https://otrkeyfinder.com/en/?search={{ t.file }}&order=date-name"><span class="badge badge-{{ t.format|format2label }}">{{ t.format }}</span> {{ t.title }}</a></td>
                 <td>{{ t.length }}</td>
                 <td>{{ t.item_count }}</td>
                 <td><a href="https://www.imdb.com/find?q={{ t.title }}&s=all">IMDB</a></td>
