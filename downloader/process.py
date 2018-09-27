@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+from celery import shared_task
 import re, os, shutil, sys
 from argparse import ArgumentParser
 from urllib import parse
@@ -34,7 +35,7 @@ class MediaInformation:
 
         return getDecryptedName(otrkey)
 
-
+@shared_task
 def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     if not os.path.exists(temp_path): os.mkdir(temp_path)
     video = MediaInformation(video_url)
@@ -68,6 +69,11 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
 
     listfile = f"{video.get_decrypted(dest_path)}.txt"
 
+    print(f"Video:\t{video_url}")
+    if audio:
+        print(f"Audio:\t{audio_url}")
+    print(f"Cutlist:\t{cutlist}")
+
     if os.path.exists(listfile):
         os.remove(listfile)
     requiresDownload = False
@@ -76,12 +82,12 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
         print(f"audio.decrypted: {audio.get_decrypted(dest_path)}")
     if os.path.exists(video.get_decrypted(dest_path)):
         print("Video already decrypted")
-    elif not os.path.exists(video.get_otrkey(dest_path)):
+    else:# not os.path.exists(video.get_otrkey(dest_path)):
       if add_download_list(listfile, video.url, video.get_otrkey(dest_path)):
           requiresDownload = True
     if audio and os.path.exists(audio.get_decrypted(dest_path)):
       print("Audio already decrypted")
-    elif audio and not os.path.exists(audio.get_otrkey(dest_path)):
+    elif audio:# and not os.path.exists(audio.get_otrkey(dest_path)):
       if add_download_list(listfile, audio.url, audio.get_otrkey(dest_path)):
           requiresDownload = True
 

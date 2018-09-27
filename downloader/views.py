@@ -11,7 +11,7 @@ def add(request):
         mega = request.POST.get("Mega", False)
         if video and cutlist:
             ctx = {}
-            if not process(video, cutlist, audio_url=audio, mega=mega, keep=False):
+            if not process.delay(video, cutlist, audio_url=audio, mega=mega, keep=False):
                 ctx['failed'] = True
             return render(request, 'downloader/index.html', {})
         # function process($video, $audio, $cutlist, $mega) {

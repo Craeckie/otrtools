@@ -1,7 +1,3 @@
-from celery import Celery
+from celery import shared_task
 
-app = Celery('downloader', broker='pyamqp://guest@localhost//')
-
-@app.task
-def add(x, y):
-    return x + y
+from .process import process

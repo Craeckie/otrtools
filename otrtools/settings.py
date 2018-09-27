@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djcelery',
+    'django_celery_results',
     'downloader',
     'searcher'
 ]
@@ -115,7 +117,11 @@ USE_L10N = True
 
 USE_TZ = True
 
+import djcelery
+djcelery.setup_loader()
 
+CELERY_RESULT_BACKEND = 'amqp://user:FzWcvA_rCCgq-V_hDXoIMM4ySYpecuz@localhost:5672/vhost'
+BROKER_URL = 'amqp://user:FzWcvA_rCCgq-V_hDXoIMM4ySYpecuz@localhost:5672/vhost'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
