@@ -1,4 +1,9 @@
 #!/usr/bin/python3
+import os
+
+ALLOWED_HOSTS = ['example.com']
+
+# Debug = False
 
 OTR_USERNAME = "someone@example.com"
 OTR_PASSWORD = "secret password"

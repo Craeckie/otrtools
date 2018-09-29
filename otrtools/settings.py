@@ -125,6 +125,8 @@ BROKER_URL = 'amqp://user:FzWcvA_rCCgq-V_hDXoIMM4ySYpecuz@localhost:5672/vhost'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
 STATIC_URL = '/static/'
 
 WWW_DIR = 'www/'

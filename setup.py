@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name='OTRTools',
-    version='0.1',
+    version='0.1.1',
     url="N/A",
     description="OTRTools",
     packages=setuptools.find_packages(),
@@ -12,7 +12,10 @@ setuptools.setup(
 #     long_description_content_type="text/markdown",
 
     install_requires=[
-        "celery",
-        "django"
+        'bs4',
+        'celery',
+        'django',
+        'requests',
+        'urllib3'
     ]
 )
