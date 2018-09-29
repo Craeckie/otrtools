@@ -1,7 +1,11 @@
 ## The following requirements were added by pip freeze:
+anyjson
+bs4
 celery~=4.2.1
 Django~=2.1.1
 django-celery~=3.2.2
 django-celery-beat~=1.1.1
 django-celery-results~=1.0.1
 flower~=0.9.2
+requests
+urllib3
