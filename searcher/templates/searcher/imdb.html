@@ -1,7 +1,7 @@
 {% load imdb_tags %}
 <html>
 <head>
-  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
@@ -11,9 +11,11 @@
   <div class="container">
     <table class="table table-striped">
       {% for e in episodes %}
+      {% with forloop.counter as e_num %}
         <tr>
           <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a href="{{ e.url }}">{{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
           {% if 'otr' in e %}
+          <td>
             {% with e.otr as titles %}
             <table class="table table-striped">
             {% for t in titles %}
@@ -21,14 +23,53 @@
                 <td><a href="https://otrkeyfinder.com/en/?search={{ t.file }}&order=date-name"><span class="badge badge-{{ t.format|format2label }}">{{ t.format }}</span> {{ t.title }}</a></td>
                 <td>{{ t.length }}</td>
                 <td>{{ t.item_count }}</td>
-                <td><a href="https://www.imdb.com/find?q={{ t.title }}&s=all">IMDB</a></td>
-                <td><a href="https://www.youtube.com/results?search_query={{ t.title }} Trailer">Youtube Trailer</a></td>
+              </tr>
+              <tr>
+                <td>
+                  <table class="table">
+                    {% for m in t.mirrors %}
+                        <tr>
+                          <td><a href="{{ m.link }}">{{ m.name }}</a></td>
+                        </tr>
+                    {% empty %}
+                        No mirrors found! :(
+                    {% endfor %}
+                  </table>
+                </td>
+                <td>
+                  <table class="table" id="cutlist-table-{{ e_num }}{{ forloop.counter }}">
+
+                  </table>
+                  <script type="text/javascript">
+                    $.getJSON("{% url 'cutlist' t.file_decrypted %}", function(data) {
+                      items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
+                      console.log(data.items)
+                      $.each(data.items, function (key, item) {
+                        row = '<tr>';
+                        row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
+                        row += '<td>' + item.hits + '</td>';
+                        row += '<td><a href="http://www.cutlist.at/getfile.php?id=' + item.id + '">Link</a></td>';
+                        row += '</tr>';
+                        items.push(row);
+                      });
+                      console.log(items);
+                      // for (var item in data) {
+                      //   if (data.hasOwnProperty(item)) {
+                      //
+                      //   }
+                      // }
+                      $('#cutlist-table-{{ e_num }}{{ forloop.counter }}').html(items.join(""));
+                    });
+                  </script>
+                </td>
               </tr>
             {% endfor %}
             </table>
             {% endwith %}
+          </td>
           {% endif %}
         </tr>
+      {% endwith %}
       {% endfor %}
     </table>
   </div>

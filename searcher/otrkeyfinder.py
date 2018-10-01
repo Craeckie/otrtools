@@ -36,7 +36,7 @@ def loadKeys():
             m = re.search('(?P<name>[a-zA-Z0-9_-]+)_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9A-Za-z-]+_[0-9]+_TVOON_DE[A-Za-z0-9.]+$', key)
             if m:
               name = m.group("name")
-              print(name)
+              # print(name)
               names.add(name)
             else:
               print(f"Couldn't parse {key}!")
@@ -55,14 +55,41 @@ def toOTRName(name):
       .replace('\'', '_')
 
 @lru_cache(maxsize=1024)
-def _getFiles(p, search):
+def _getOtrkeys(p, search):
     print(f"Retreiving page: {p} for search '{search}'")
     r = requests.get('https://otrkeyfinder.com/en/?search=%s&order=date-name&page=%s' % (search, p))
     b = BeautifulSoup(r.text, 'html.parser')
-    spans = b.find_all('span', { 'class': 'file'})
+    otrkey_divs = b.find_all('div', { 'class': 'otrkey'})
     files = []
-    if spans:
-        files = [s.string for s in spans]
+    for otrkey_div in otrkey_divs:
+        file_spans = otrkey_div.find_all('span', { 'class': 'file' })
+        if len(file_spans) > 0:
+            file = file_spans[0].string
+            mirrors = []
+            mirror_divs = otrkey_div.find_all('div', { 'class': 'mirror' })
+            for mirror_div in mirror_divs:
+                mirror = {}
+                links = mirror_div.find_all('a', { 'target': '_blank' })
+                if len(links) > 0:
+                    link = links[0]
+                    name = link.string
+                    href = link.attrs['href']
+                    mirror = {
+                      'name': name,
+                      'link': href
+                    }
+                else:
+                    print(f"Error: couldn't find a link in {mirror_div}")
+                if mirror:
+                    mirrors.append(mirror)
+            files.append({
+                'file': file,
+                'mirrors': mirrors
+            })
+        else:
+            print(f"Error: couldn't find a 'file' span in {otrkey_div}")
+    # if spans:
+    #     files = [s.string for s in spans]
     return files
 
 format_name = {
@@ -75,12 +102,14 @@ format_name = {
 
 def parsePage(p, search, min_dur, key_names):
     titles = []
-    files = _getFiles(p, search)
+    otrkeys = _getOtrkeys(p, search)
     (keys, names) = key_names
     print(f"{len(keys)}, {len(names)}")
 
-    for f in files:
-      m = re.match('(?P<title>[a-zA-Z0-9_-]+)_(?P<time>[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2})_(?P<sender>[^_]+)_(?P<length>[0-9]+)_TVOON_DE.(?P<format>[a-zA-Z0-9.]+)\.otrkey', f)
+    for otrkey in otrkeys:
+      file = otrkey['file']
+      file_decrypted = re.sub('\.otrkey$', '', file)
+      m = re.match('(?P<title>[a-zA-Z0-9_-]+)_(?P<time>[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2})_(?P<sender>[^_]+)_(?P<length>[0-9]+)_TVOON_DE.(?P<format>[a-zA-Z0-9.]+)\.otrkey', file)
       if m:
         time = timedelta(minutes=int(m.group('length')))
         #print(time)
@@ -89,21 +118,23 @@ def parsePage(p, search, min_dur, key_names):
           format = m.group('format')
           if format in format_name:
               format = format_name[format]
-          isDecoded = f.replace('.otrkey', '') in keys
+          isDecoded = file.replace('.otrkey', '') in keys
           isSimilarDecoded = title in names
 
           #print(f"File: '{f}', isDecoded: {isDecoded}")
           titles.append({
             'title': title.replace('_', ' '),
             'length': time,
-            'file': f,
+            'file': file,
+            'file_decrypted': file_decrypted,
+            'mirrors': otrkey['mirrors'],
             'format': format,
             'isDecoded': isDecoded,
             'isSimilarDecoded': isSimilarDecoded
             })
           # print("Title: %s, Length: %s" % (title, time))
       else:
-        print("Error parsing %s!" % f)
+        print("Error parsing %s!" % file)
     return titles
 
 def get_titles(search, page_start=0, page_num=20, min_dur=60):
