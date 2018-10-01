@@ -15,9 +15,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from filebrowser.sites import site
+
 import downloader.urls
 
 urlpatterns = [
+    path('admin/filebrowser/', site.urls),
+    path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     path('search/', include('searcher.urls')),
     path('download/', include('downloader.urls')),
