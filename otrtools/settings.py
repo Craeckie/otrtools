@@ -31,6 +31,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'grappelli',
+    'filebrowser',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -120,8 +122,8 @@ USE_TZ = True
 import djcelery
 djcelery.setup_loader()
 
-CELERY_RESULT_BACKEND = 'amqp://user:FzWcvA_rCCgq-V_hDXoIMM4ySYpecuz@localhost:5672/vhost'
-BROKER_URL = 'amqp://user:FzWcvA_rCCgq-V_hDXoIMM4ySYpecuz@localhost:5672/vhost'
+CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -129,7 +131,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'
 
-WWW_DIR = 'www/'
+
+WWW_DIR = os.path.join(BASE_DIR, 'www/')
 
 # Decryption
 OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
@@ -143,6 +146,7 @@ CUT_DIR = os.path.join(WWW_DIR, 'temp')
 # Saving video files
 DEST_DIR = os.path.join(WWW_DIR, 'videos')
 DEST_EXT = "avi"
+MEDIA_URL = '/media/'
 
 # Production settings (keep at the end)
 PRODUCTION_SETTINGS_PATH=os.path.join(os.path.dirname(__file__), "production.py")
