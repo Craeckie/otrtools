@@ -110,6 +110,8 @@ def cut(video, cutlist_path, video_base, audio=None):
     print("Removing video base at " + os.path.abspath(video_base))
     shutil.rmtree(video_base)
 
+    print(f"Video saved to {dest_path}")
+
     return dest_path
 
 if __name__ == 'main':
