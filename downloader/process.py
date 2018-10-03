@@ -26,11 +26,11 @@ class MediaInformation:
         match = parse_base_name(self.url)
         if match:
             return match.group('name')
-    def get_otrkey(self, dest_path):
+    def get_otrkey(self, dest_path=''):
         match = parse_media_name(self.url)
         if match:
             return os.path.join(dest_path, match.group(0))
-    def get_decrypted(self, dest_path):
+    def get_decrypted(self, dest_path=''):
         otrkey = self.get_otrkey(dest_path)
 
         return getDecryptedName(otrkey)
@@ -54,11 +54,12 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
             print("Error: couldn't parse audio as otrkey format")
             return False
 
-    logpath = os.path.join(wwwdir, "logs", video.get_decrypted(dest_path))
+    logpath = video.get_decrypted(settings.LOG_DIR)
     print("Log path: %s" % logpath)
     if os.path.exists(logpath):
       print("Log directory already exists!")
     else:
+      print(f"Creating log dir at {logpath}")
       os.makedirs(logpath)
         # for source, dest in {'log-index.php':'index.php', 'read-log.php':'read-log.php'}.items():
         #     srcpath = os.path.join(php_path, source)
@@ -75,6 +76,7 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     print(f"Cutlist:\t{cutlist}")
 
     if os.path.exists(listfile):
+        print(f"Removing old listfile at {listfile}")
         os.remove(listfile)
     requiresDownload = False
     print(f"video.decrypted: {video.get_decrypted(dest_path)}")
@@ -83,12 +85,12 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     if os.path.exists(video.get_decrypted(dest_path)):
         print("Video already decrypted")
     else:# not os.path.exists(video.get_otrkey(dest_path)):
-      if add_download_list(listfile, video.url, video.get_otrkey(dest_path)):
+      if add_download_list(listfile, video.url, dest_path, video.get_otrkey()):
           requiresDownload = True
     if audio and os.path.exists(audio.get_decrypted(dest_path)):
       print("Audio already decrypted")
     elif audio:# and not os.path.exists(audio.get_otrkey(dest_path)):
-      if add_download_list(listfile, audio.url, audio.get_otrkey(dest_path)):
+      if add_download_list(listfile, audio.url, dest_path, audio.get_otrkey()):
           requiresDownload = True
 
 
@@ -97,9 +99,14 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
           print("Download failed! :(")
           return False
         else:
-          print("Download successful! :)")
+          if os.path.exists(video.get_otrkey(dest_path)):
+              print("Download successful! :)")
+              print(f"Removing listfile at {listfile}")
+              os.remove(listfile)
+          else:
+              print("Download finished, but couldn't find downloaded file! :(")
+              return False
 
-        os.remove(listfile)
 
     if not os.path.exists(video.get_decrypted(dest_path)):
         if not decrypt(video.get_otrkey(dest_path), video.get_decrypted(dest_path)):

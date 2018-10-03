@@ -14,7 +14,7 @@ def getDecryptedName(otrkey):
 
 def decrypt(otrkey, dest):
     if os.path.exists(dest):
-        print("Destination already exists, removing..")
+        print(f"Destination already exists at {dest}, removing..")
         os.path.remove(dest)
 
     print(f"Decrypting {otrkey} to {dest}")

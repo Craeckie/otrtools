@@ -2,10 +2,10 @@
 import os, subprocess
 from .cut_util import parse_media_name
 
-def add_download_list(listfile, url, dest):
-
+def add_download_list(listfile, url, dest_path, filename):
+    print(f"Adding {url} to download list at {listfile}")
     with open(listfile, 'a') as f:
-      f.write(f"{url}\n out={dest}\n")
+      f.write(f"{url}\n dir={dest_path}\n out={filename}\n")
       return listfile
 
 def download(listfile, video_url, audio_url=None):
