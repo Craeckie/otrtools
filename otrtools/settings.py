@@ -123,7 +123,8 @@ import djcelery
 djcelery.setup_loader()
 
 CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
-BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
+#BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -147,6 +148,9 @@ CUT_DIR = os.path.join(WWW_DIR, 'temp')
 DEST_DIR = os.path.join(WWW_DIR, 'videos')
 DEST_EXT = "avi"
 MEDIA_URL = '/media/'
+
+# Logging
+LOG_DIR = os.path.join(WWW_DIR, 'logs/')
 
 # Production settings (keep at the end)
 PRODUCTION_SETTINGS_PATH=os.path.join(os.path.dirname(__file__), "production.py")

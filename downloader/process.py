@@ -54,11 +54,12 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
             print("Error: couldn't parse audio as otrkey format")
             return False
 
-    logpath = os.path.join(wwwdir, "logs", video.get_decrypted(dest_path))
+    logpath = video.get_decrypted(settings.LOG_DIR)
     print("Log path: %s" % logpath)
     if os.path.exists(logpath):
       print("Log directory already exists!")
     else:
+      print(f"Creating log dir at {logpath}")
       os.makedirs(logpath)
         # for source, dest in {'log-index.php':'index.php', 'read-log.php':'read-log.php'}.items():
         #     srcpath = os.path.join(php_path, source)
