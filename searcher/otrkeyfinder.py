@@ -52,7 +52,9 @@ def toOTRName(name):
       .replace(' ', '_') \
       .replace(':', ' ') \
       .replace('.', '_') \
-      .replace('\'', '_')
+      .replace('\'', '_') \
+      .replace(',', '_') \
+      .replace('?', '')
 
 @lru_cache(maxsize=1024)
 def _getOtrkeys(p, search):

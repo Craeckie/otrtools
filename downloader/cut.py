@@ -12,7 +12,7 @@ from .cutlist import get_cutlist
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
-def cut(video, cutlist_path, video_base, audio=None):
+def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
     if not os.path.exists(video_base):
       os.mkdir(video_base)
     cutlist = get_cutlist(cutlist_path)
@@ -104,11 +104,11 @@ def cut(video, cutlist_path, video_base, audio=None):
 
         # Fix permissions?
         # shutil.chown(dest_path, user="www-data", group="www-data")
+        if not keepTemp:
+            print("Removing video base at " + os.path.abspath(video_base))
+            shutil.rmtree(video_base)
     else:
         print("Cutting failed!")
-    # os.chdir("..")
-    print("Removing video base at " + os.path.abspath(video_base))
-    shutil.rmtree(video_base)
 
     print(f"Video saved to {dest_path}")
 
@@ -183,7 +183,7 @@ if __name__ == 'main':
 
     # os.chdir(video_base)
 
-    dest = cut(video, cutlist, video_base, audio)
+    dest = cut(video, cutlist, video_base, audio, args.keep)
 
     if dest:
         if args.mega:

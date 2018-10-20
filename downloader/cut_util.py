@@ -228,10 +228,10 @@ def cut_video(encoder, cutlist, video, video_base, keyframe_list, meta_comment=N
 
 def parse_media_name(filename):
     #Southpaw_17.10.10_21-00_ukfilm4_145_TVOON_DE.mpg.HD.avi
-    filename_match = re.search('(?P<name>[a-zA-Z0-9_-]+)_(?P<date>[0-9]{2}\.[0-9]{2}\.[0-9]{2})_(?P<time>[0-9]{2}-[0-9]{2})_(?P<sender>[0-9A-Za-z-]+)_(?P<duration>[0-9]+)_TVOON_DE(?P<extension>[A-Za-z0-9.]+)$', filename)
+    filename_match = re.search('(?P<name>[a-zA-Z0-9_-]+)_(?P<date>[0-9]{2}\.[0-9]{2}\.[0-9]{2})_(?P<time>[0-9]{2}-[0-9]{2})_(?P<sender>[0-9A-Za-z-]+)_(?P<duration>[0-9]+)_TVOON_DE(?P<extension>[A-Za-z0-9.]+)', filename)
     return filename_match
 def parse_base_name(filename):
-    basename_match = re.search('(?P<name>[a-zA-Z0-9_-]+_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9A-Za-z-]+_[0-9]+_TVOON_DE)(?P<extension>[A-Za-z0-9.]+)$', filename)
+    basename_match = re.search('(?P<name>[a-zA-Z0-9_-]+_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9A-Za-z-]+_[0-9]+_TVOON_DE)(?P<extension>[A-Za-z0-9.]+)', filename)
     return basename_match
 
 def get_real_name(filename, extension):
