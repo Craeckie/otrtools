@@ -15,7 +15,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
     if not os.path.exists(video_base):
       os.mkdir(video_base)
-    cutlist = get_cutlist(cutlist_path)
+    cutlist = get_cutlist(cutlist_path, video_base)
 
     video_info = parse_media_name(video).groups()
     if not video_info:
@@ -30,11 +30,11 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
       print(f"Removing video{video}) and audio({audio})")
       os.remove(video)
       os.remove(audio)
-      print(f"Using merge ({tmp_merge_name}) as video")
-      video = tmp_merge_name
+      # print(f"Using merge ({tmp_merge_name}) as video")
+      # video = tmp_merge_name
       # video = os.path.splitext(video)[0] + "." + settings.CUT_EXT
-      # print("Moving merged video(" + tmp_merge_name + "->" + video)
-      # os.rename(tmp_merge_name, video)
+      print("Moving merged video(" + tmp_merge_name + "->" + video)
+      os.rename(tmp_merge_name, video)
 
     # Get list of key frames
     print("Searching all keyframes..")
@@ -100,7 +100,7 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
 
         elif len(cut_files) == 1:
           print("Only one cut, just moving cut file")
-          os.rename(cut_files[0], dest_path)
+          shutil.move(cut_files[0], dest_path)
 
         # Fix permissions?
         # shutil.chown(dest_path, user="www-data", group="www-data")

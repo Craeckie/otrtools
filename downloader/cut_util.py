@@ -19,8 +19,8 @@ def get_codec(video):
       print(ext)
       return format2codec.get(ext)
   else:
-      print("Codec not found for extension: %s!" % ext)
-      return None
+      print("Codec not found for {video}! Using codec for HQ/HD.")
+      return format2codec.get('mpg.HQ.avi')
 
 def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, meta_comment=None):
   # if transcode:
