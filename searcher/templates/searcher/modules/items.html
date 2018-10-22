@@ -32,10 +32,12 @@
         items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
         console.log(data.items)
         $.each(data.items, function (key, item) {
+          cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
           row = '<tr>';
           row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
           row += '<td>' + item.hits + '</td>';
-          row += '<td><a href="http://www.cutlist.at/getfile.php?id=' + item.id + '">Link</a></td>';
+          row += '<td><a href="' + cutlist_url + '">Link</a></td>';
+          row += '<td><a href="{% url 'downloader:add' %}?Video={{ item.chosen_mirror.link }}&Cutlist='  + cutlist_url + '" title="Uses {{ item.chosen_mirror.name }}">To Downloader</a></td>';
           row += '</tr>';
           items.push(row);
         });

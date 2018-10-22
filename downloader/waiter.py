@@ -47,7 +47,7 @@ def get_dl_url(url, otrkey=None):
         if match:
             print("Waiting in Queue position %s.." % match.group(1), flush=True)
         else:
-            print("Waiting in Queue: %s" % content[:100], flush=True)
+            print("Waiting in Queue: %s" % content, flush=True)
         time.sleep(30)
 
 if __name__ == 'main':

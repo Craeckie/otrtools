@@ -123,6 +123,12 @@ def parsePage(p, search, min_dur, key_names):
               format = format_name[format]
           isDecoded = file.replace('.otrkey', '') in keys
           isSimilarDecoded = title in names
+          mirrors = otrkey['mirrors']
+          if len(mirrors) > 0:
+            chosen_mirror = mirrors[0]
+            for mirror in mirrors:
+                if 'otr.datenkeller.net' in mirror['link']:
+                    chosen_mirror = mirror
 
           #print(f"File: '{f}', isDecoded: {isDecoded}")
           titles.append({
@@ -130,7 +136,8 @@ def parsePage(p, search, min_dur, key_names):
             'length': time,
             'file': file,
             'file_decrypted': file_decrypted,
-            'mirrors': otrkey['mirrors'],
+            'mirrors': mirrors,
+            'chosen_mirror': chosen_mirror,
             'format': format,
             'isDecoded': isDecoded,
             'isSimilarDecoded': isSimilarDecoded

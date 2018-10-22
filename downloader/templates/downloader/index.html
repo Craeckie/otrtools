@@ -98,11 +98,11 @@
         <form action="{% url 'downloader:add' %}" method="post" >
           {% csrf_token %}
           <label for="Video">Video:</label>
-          <input type="text" name="Video" size="50" placeholder="http://"><br>
+          <input type="text" name="Video" size="50" placeholder="http://" value="{{ video }}"><br>
           <label for="Audio">Audio(AC3) (optional):</label>
-          <input type="text" name="Audio" size="50" placeholder="http://"><br>
+          <input type="text" name="Audio" size="50" placeholder="http://" value="{{ audio }}"><br>
           <label for="Cutlist">Cutlist:</label>
-          <input type="text" name="Cutlist" size="35" placeholder="http://www.cutlist.at/getfile.php?id="><br>
+          <input type="text" name="Cutlist" size="35" placeholder="http://www.cutlist.at/getfile.php?id=" value="{{ cutlist }}"><br>
           <div class="checkbox">
            <label>
              <input type="checkbox" name="Mega">Upload video to MEGA<br>

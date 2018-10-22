@@ -32,6 +32,10 @@ def add(request):
         #   echo $output . "</code><br><br>";
         #   return $otrkey;
         # }
-    else:
-        return render(request, 'downloader/index.html', {})
+    elif request.method.lower() == "get":
+        return render(request, 'downloader/index.html', {
+          'video': request.GET.get("Video", ""),
+          'audio': request.GET.get("Audio", ""),
+          'cutlist': request.GET.get("Cutlist", "")
+        })
         #return HttpResponse("Hello, world. You're at the downloader.")
