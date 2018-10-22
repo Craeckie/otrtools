@@ -11,65 +11,18 @@
   <div class="container">
     <table class="table table-striped">
       {% for e in episodes %}
-      {% with forloop.counter as e_num %}
         <tr>
           <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a href="{{ e.url }}">{{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
           {% if 'otr' in e %}
           <td>
             {% with e.otr as titles %}
             <table class="table table-striped">
-            {% for t in titles %}
-              <tr>
-                <td><a href="https://otrkeyfinder.com/en/?search={{ t.file }}&order=date-name"><span class="badge badge-{{ t.format|format2label }}">{{ t.format }}</span> {{ t.title }}</a></td>
-                <td>{{ t.length }}</td>
-                <td>{{ t.item_count }}</td>
-              </tr>
-              <tr>
-                <td>
-                  <table class="table">
-                    {% for m in t.mirrors %}
-                        <tr>
-                          <td><a href="{{ m.link }}">{{ m.name }}</a></td>
-                        </tr>
-                    {% empty %}
-                        No mirrors found! :(
-                    {% endfor %}
-                  </table>
-                </td>
-                <td>
-                  <table class="table" id="cutlist-table-{{ e_num }}{{ forloop.counter }}">
-
-                  </table>
-                  <script type="text/javascript">
-                    $.getJSON("{% url 'cutlist' t.file_decrypted %}", function(data) {
-                      items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
-                      console.log(data.items)
-                      $.each(data.items, function (key, item) {
-                        row = '<tr>';
-                        row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
-                        row += '<td>' + item.hits + '</td>';
-                        row += '<td><a href="http://www.cutlist.at/getfile.php?id=' + item.id + '">Link</a></td>';
-                        row += '</tr>';
-                        items.push(row);
-                      });
-                      console.log(items);
-                      // for (var item in data) {
-                      //   if (data.hasOwnProperty(item)) {
-                      //
-                      //   }
-                      // }
-                      $('#cutlist-table-{{ e_num }}{{ forloop.counter }}').html(items.join(""));
-                    });
-                  </script>
-                </td>
-              </tr>
-            {% endfor %}
+              {% include "searcher/modules/items.html" with items=titles num=forloop.counter %}
             </table>
             {% endwith %}
           </td>
           {% endif %}
         </tr>
-      {% endwith %}
       {% endfor %}
     </table>
   </div>

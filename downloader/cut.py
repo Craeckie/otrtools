@@ -30,8 +30,8 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
       print(f"Removing video{video}) and audio({audio})")
       os.remove(video)
       os.remove(audio)
-      print(f"Using merge ({merge}) as video")
-      video = merge
+      print(f"Using merge ({tmp_merge_name}) as video")
+      video = tmp_merge_name
       # video = os.path.splitext(video)[0] + "." + settings.CUT_EXT
       # print("Moving merged video(" + tmp_merge_name + "->" + video)
       # os.rename(tmp_merge_name, video)
@@ -114,7 +114,7 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
 
     return dest_path
 
-if __name__ == 'main':
+if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-m", "--mega",
                         help="Set to upload video to MEGA",
@@ -133,6 +133,9 @@ if __name__ == 'main':
                         help="The audio to merge and cut")
     # parser.add_argument("--megacall", help="The command to upload a video to MEGA")
     args = parser.parse_args()
+    video = args.video
+    audio = args.audio
+    cutlist = args.cutlist
 
     if os.path.exists(video):
       video = os.path.realpath(video)
@@ -157,8 +160,6 @@ if __name__ == 'main':
                 print("Decryption of audio failed!")
                 sys.exit(1)
 
-    video = args.video
-    audio = args.audio
 
     video_base = re.match("^(.*)\.[a-zA-Z0-9]+$", video).group(1)
     print("Video Base (and cwd): " + video_base)

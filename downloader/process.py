@@ -4,7 +4,7 @@ import re, os, shutil, sys
 from argparse import ArgumentParser
 from urllib import parse
 from .decrypt import getDecryptedName, decrypt
-from .download_util import add_download_list, download
+from .download_util import prepare_download, download
 from .cut_util import parse_base_name, parse_media_name
 from .cut import cut
 from django.conf import settings
@@ -68,44 +68,26 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
         #     shutil.copy(srcpath, destpath)
 
 
-    listfile = f"{video.get_decrypted(dest_path)}.txt"
 
     print(f"Video:\t{video_url}")
     if audio:
         print(f"Audio:\t{audio_url}")
     print(f"Cutlist:\t{cutlist}")
 
-    if os.path.exists(listfile):
-        print(f"Removing old listfile at {listfile}")
-        os.remove(listfile)
-    requiresDownload = False
-    print(f"video.decrypted: {video.get_decrypted(dest_path)}")
-    if audio:
-        print(f"audio.decrypted: {audio.get_decrypted(dest_path)}")
-    if os.path.exists(video.get_decrypted(dest_path)):
-        print("Video already decrypted")
-    else:# not os.path.exists(video.get_otrkey(dest_path)):
-      if add_download_list(listfile, video.url, dest_path, video.get_otrkey()):
-          requiresDownload = True
-    if audio and os.path.exists(audio.get_decrypted(dest_path)):
-      print("Audio already decrypted")
-    elif audio:# and not os.path.exists(audio.get_otrkey(dest_path)):
-      if add_download_list(listfile, audio.url, dest_path, audio.get_otrkey()):
-          requiresDownload = True
+    listfile = prepare_download(video, dest_path=dest_path, audio=audio)
 
-
-    if requiresDownload:
-        if download(listfile, video_url, audio_url=audio_url) != 0:
-          print("Download failed! :(")
+    # if requiresDownload:
+    if download(listfile, video_url, audio_url=audio_url) != 0:
+      print("Download failed! :(")
+      return False
+    else:
+      if os.path.exists(video.get_otrkey(dest_path)):
+          print("Download successful! :)")
+          print(f"Removing listfile at {listfile}")
+          os.remove(listfile)
+      else:
+          print("Download finished, but couldn't find downloaded file! :(")
           return False
-        else:
-          if os.path.exists(video.get_otrkey(dest_path)):
-              print("Download successful! :)")
-              print(f"Removing listfile at {listfile}")
-              os.remove(listfile)
-          else:
-              print("Download finished, but couldn't find downloaded file! :(")
-              return False
 
 
     if not os.path.exists(video.get_decrypted(dest_path)):

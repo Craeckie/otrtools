@@ -7,7 +7,8 @@ format_label = {
   'AVI' : 'primary',
   'HQ'  : 'danger',
   'HD'  : 'warning',
-  'MP4' : 'success'
+  'MP4' : 'info',
+  'AC3' : 'success'
 }
 @register.filter(name='format2label')
 def format2label(f):

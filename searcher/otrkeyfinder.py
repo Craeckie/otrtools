@@ -7,11 +7,12 @@ from itertools import chain, repeat
 from django.conf import settings
 
 class Title:
-    def __init__(self, title, length, items, isSimilarDecoded):
+    def __init__(self, title, length, items, isSimilarDecoded, num):
       self.title = title
       self.length = length
       self.items = items
       self.isSimilarDecoded = isSimilarDecoded
+      self.num = num
 
     def item_count(self):
       return len(self.items)

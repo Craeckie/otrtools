@@ -1,6 +1,36 @@
 #!/usr/bin/python3
 import os, subprocess
+from multiprocessing.pool import ThreadPool
 from .cut_util import parse_media_name
+from .waiter import get_dl_url
+
+def prepare_download(video, dest_path, audio=None):
+    listfile = f"{video.get_decrypted(dest_path)}.txt"
+    print(f"Preparing download. Listfile: {listfile}")
+    if os.path.exists(listfile):
+        print(f"Removing old listfile at {listfile}")
+        os.remove(listfile)
+    # requiresDownload = False
+    pool = ThreadPool(processes=2)
+    results = []
+    print(f"video.decrypted: {video.get_decrypted(dest_path)}")
+    if audio:
+        print(f"audio.decrypted: {audio.get_decrypted(dest_path)}")
+    if os.path.exists(video.get_decrypted(dest_path)):
+        print("Video already decrypted")
+    else:# not os.path.exists(video.get_otrkey(dest_path)):
+        results.append(pool.apply_async(get_dl_url, (video.url, video.get_otrkey())))
+    if audio and os.path.exists(audio.get_decrypted(dest_path)):
+      print("Audio already decrypted")
+    elif audio:# and not os.path.exists(audio.get_otrkey(dest_path)):
+        results.append(pool.apply_async(get_dl_url, (audio.url, audio.get_otrkey())))
+        # add_download_list(listfile, audio.url, dest_path, audio.get_otrkey())
+          # requiresDownload = True
+    for r in results:
+        (url, otrkey) = r.get()
+        print(f"New url: {url} for {otrkey}")
+        add_download_list(listfile, url, dest_path, otrkey)
+    return listfile
 
 def add_download_list(listfile, url, dest_path, filename):
     print(f"Adding {url} to download list at {listfile}")
@@ -9,7 +39,6 @@ def add_download_list(listfile, url, dest_path, filename):
       return listfile
 
 def download(listfile, video_url, audio_url=None):
-
     dl_parts = 4
     if any('otr-files.de/' in url for url in [video_url, audio_url] if url):
         dl_parts = 1

@@ -13,9 +13,12 @@ sortkeyfn = lambda t:t['title']
 
 def group_titles(titles):
     res = []
+    num = 0;
     for k,values in groupby(titles, sortkeyfn):
         # print(k)
         values = list(values)
+        for i in range(0, len(values)):
+            values[i]['num'] = i
         isSimilarDecoded = any(x['isSimilarDecoded'] for x in values)
         if 'Ziemlich' in k:
           print(isSimilarDecoded)
@@ -23,7 +26,7 @@ def group_titles(titles):
         item_count = len(seconds)
         time = timedelta(seconds=sum(seconds) / item_count)
 
-        res.append(Title(k, time, values, isSimilarDecoded)) #{'title': k, 'length': time, 'items':list(values)})
+        res.append(Title(k, time, values, isSimilarDecoded, num)) #{'title': k, 'length': time, 'items':list(values)})
     return res
 
 def index(request):
