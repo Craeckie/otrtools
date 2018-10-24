@@ -1,7 +1,7 @@
 {% load imdb_tags %}
 {% for item in items %}
 <tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>
-  <td><a href="https://otrkeyfinder.com/en/?search={{ item.file }}&order=date-name"><span class="badge badge-{{ item.format|format2label }}">{{ item.format }}</span> {{ item.title }}</a></td>
+  <td><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ item.file }}&order=date-name"><span class="badge badge-{{ item.format|format2label }}">{{ item.format }}</span> {{ item.title }}</a></td>
   <td>{{ item.length }}</td>
   <td>{{ item.item_count }}</td>
 </tr>
@@ -10,7 +10,7 @@
     <table class="table">
       {% for m in item.mirrors %}
       <tr>
-        <td><a href="{{ m.link }}">{{ m.name }}</a></td>
+        <td><a target="_blank" href="{{ m.link }}">{{ m.name }}</a></td>
       </tr>
       {% empty %}
           No mirrors found! :(
@@ -36,8 +36,8 @@
           row = '<tr>';
           row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
           row += '<td>' + item.hits + '</td>';
-          row += '<td><a href="' + cutlist_url + '">Link</a></td>';
-          row += '<td><a href="{% url 'downloader:add' %}?Video={{ item.chosen_mirror.link }}&Cutlist='  + cutlist_url + '" title="Uses {{ item.chosen_mirror.name }}">To Downloader</a></td>';
+          row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
+          row += '<td><a target="_blank" href="{% url 'downloader:add' %}?Video={{ item.chosen_mirror.link|urlencode }}&Cutlist='  + cutlist_url + '" title="Uses {{ item.chosen_mirror.name }}">To Downloader</a></td>';
           row += '</tr>';
           items.push(row);
         });

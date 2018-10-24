@@ -102,9 +102,6 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     #if audio:
     #    audio_path = os.path.join(dest_path, audio)
 
-    #TODO: fix..
-    # os.chdir(dest_path)
-
     print("Starting cutting..")
     if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None):
         if mega:

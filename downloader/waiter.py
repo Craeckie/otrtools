@@ -6,32 +6,20 @@ import requests
 
 url="https://otr.datenkeller.net/?getFile=The_100__Praimfaya_17.05.24_21-00_uswpix_60_TVOON_DE.mpg.HD.avi.otrkey"
 
-def get_dl_url(url, otrkey=None):
-    print(f"get_dl_url for {url}")
-    if not url:
-        return url
-    session = requests.session()
-    h = requests.head(url, allow_redirects=True)
-    url = h.url
-    print(f"Redirected to {url}")
+session = requests.session()
 
-    parse_url = urlparse(url)
-    if parse_url.hostname != 'otr.datenkeller.net':
-        return (url, otrkey)
-
+def _datenkeller(url, otrkey=None):
+    print("Parsing download link from otr.datenkeller.net")
     m = re.search('(?P<url>https?://otr.datenkeller.net/)?.*file=(?P<file>[^&]+)', url)
     if m:
+        old_url = url
+        session.head(old_url) # to get the cookies
         url = m.expand('\g<url>?getFile=\g<file>')
 
-
-    # cj = CookieJar()
-    # opener = urllib3.build_opener(urllib2.HTTPCookieProcessor(cj))
-
+    invalid_state_count = 0
     while True:
-      # response = opener.open(url)
-      # content = response.read()
       content = session.get(url).text
-      # <a href="#" onclick="startCount(3 , 6, 'c270917a85b5efef5cafb8c6350fd9ad', 'cluster.lastverteiler.net',  'The_100__The_Chosen_17.05.17_21-00_uswpix_60_TVOON_DE.mpg.HQ.avi.otrkey');
+      # e.g.: <a href="#" onclick="startCount(3 , 6, 'c270917a85b5efef5cafb8c6350fd9ad', 'cluster.lastverteiler.net',  'The_100__The_Chosen_17.05.17_21-00_uswpix_60_TVOON_DE.mpg.HQ.avi.otrkey');
       match = re.search("<a href=\"#\" onclick=\"startCount\([0-9]+[ ,]+[0-9]+[ ,]+'([a-zA-Z0-9]+)'[ ,]+'([a-zA-Z0-9.-]+)'[ ,]+'([A-Za-z_0-9.-]+\.otrkey)'", content)
       if match:
         print("Got the link!", flush=True)
@@ -46,9 +34,56 @@ def get_dl_url(url, otrkey=None):
         match = re.search("<tr bgcolor=lightgrey><td>Deine Position in der Warteschlange: </td><td>([^<]+)</td></tr>", content)
         if match:
             print("Waiting in Queue position %s.." % match.group(1), flush=True)
+            time.sleep(settings.DATENKELLER_QUEUE_REFRESH)
         else:
-            print("Waiting in Queue: %s" % content, flush=True)
-        time.sleep(30)
+            match = re.search("Ups, da ist was schief gelaufen... Geh nochmal auf die", content)
+            if match:
+              print("Something went wrong, restarting queue..")
+              session.get(old_url)
+              invalid_state_count += 1
+            else:
+              print("Warning: Unknown state!", flush=True)
+              invalid_state_count += 1
+            time.sleep(5)
+        if invalid_state_count >= 5:
+            print(content)
+            raise RuntimeError(f"Error occurred when waiting in Queue of OTR for {otrkey} at URL {url}!")
+
+
+def _simpleOTR(url, otrkey=None):
+    print("Parsing download link from simple-otr-mirror.de")
+    content = session.get(url).text
+    match = re.search("<font face=Verdana >wanted file: <a href='(?P<url>[^']+)'", content)
+    if match:
+        print("Got the link!", flush=True)
+        dl_url = match.group("url")
+        print("Url: " + dl_url, flush=True)
+        return (dl_url, otrkey)
+    else:
+        raise Exception(f"Couldn't parse URL for {otrkey}:\n{content}")
+
+def get_dl_url(url, otrkey=None):
+    print(f"get_dl_url for {url}")
+    if not url:
+        return url
+    h = session.head(url, allow_redirects=True)
+    new_url = h.url
+    print(f"Redirected to {new_url}")
+
+    new_parse_url = urlparse(new_url)
+    hostname = new_parse_url.hostname
+
+    if hostname == 'otr.datenkeller.net':
+        return _datenkeller(new_url, otrkey)
+    elif hostname == 'simple-otr-mirror.de':
+        return _simpleOTR(new_url, otrkey)
+    else:
+        if urlparse(url).hostname == 'otrkeyfinder.com':
+            raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}!")
+        else:
+            return (new_url, otrkey)
+
+
 
 if __name__ == 'main':
     parser = argparse.ArgumentParser()

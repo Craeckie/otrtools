@@ -37,7 +37,8 @@ def decrypt(otrkey, dest):
         # print(text, end='\r')
         print(line.decode(), end='')
     (std, err) = prc.communicate()
-    print("")
+    print(std)
+    print(err)
     prc.stdout.close()
     return_code = prc.wait()
     if return_code == 0 and os.path.exists(dest):

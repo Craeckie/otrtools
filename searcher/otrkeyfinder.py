@@ -4,6 +4,7 @@ from datetime import timedelta
 from multiprocessing.dummy import Pool
 from functools import lru_cache
 from itertools import chain, repeat
+from operator import itemgetter
 from django.conf import settings
 
 class Title:
@@ -76,10 +77,12 @@ def _getOtrkeys(p, search):
                 if len(links) > 0:
                     link = links[0]
                     name = link.string
-                    href = link.attrs['href']
+                    url = link.attrs['href']
+
                     mirror = {
-                      'name': name,
-                      'link': href
+                      'name':     name,
+                      'link':     url,
+                      'priority': settings.MIRROR_PRIORITIES.index(name) if name in settings.MIRROR_PRIORITIES else len(settings.MIRROR_PRIORITIES)
                     }
                 else:
                     print(f"Error: couldn't find a link in {mirror_div}")
@@ -87,7 +90,7 @@ def _getOtrkeys(p, search):
                     mirrors.append(mirror)
             files.append({
                 'file': file,
-                'mirrors': mirrors
+                'mirrors': sorted(mirrors, key=itemgetter('priority', 'name')),
             })
         else:
             print(f"Error: couldn't find a 'file' span in {otrkey_div}")
@@ -126,9 +129,15 @@ def parsePage(p, search, min_dur, key_names):
           mirrors = otrkey['mirrors']
           if len(mirrors) > 0:
             chosen_mirror = mirrors[0]
-            for mirror in mirrors:
-                if 'otr.datenkeller.net' in mirror['link']:
-                    chosen_mirror = mirror
+            found_mirror = False
+            for priority in settings.MIRROR_PRIORITIES:
+                for mirror in mirrors:
+                    if mirror == mirror['name']:
+                        found_mirror = True
+                        chosen_mirror = mirror
+                        break
+                if found_mirror:
+                    break
 
           #print(f"File: '{f}', isDecoded: {isDecoded}")
           titles.append({
@@ -140,12 +149,13 @@ def parsePage(p, search, min_dur, key_names):
             'chosen_mirror': chosen_mirror,
             'format': format,
             'isDecoded': isDecoded,
-            'isSimilarDecoded': isSimilarDecoded
+            'isSimilarDecoded': isSimilarDecoded,
+            'priority': settings.FORMAT_PRIORITIES.index(format) if format in settings.FORMAT_PRIORITIES else len(settings.FORMAT_PRIORITIES)
             })
-          # print("Title: %s, Length: %s" % (title, time))
+
       else:
         print("Error parsing %s!" % file)
-    return titles
+    return sorted(titles, key=itemgetter('priority'))
 
 def get_titles(search, page_start=0, page_num=20, min_dur=60):
     #print(f"Search: {search}, start: {page_start}, num: {page_num}")

@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'djcelery',
     'django_celery_results',
     'downloader',
-    'searcher'
+    'searcher',
+    'crispy_forms',
 ]
 
 MIDDLEWARE = [
@@ -122,11 +123,8 @@ USE_TZ = True
 import djcelery
 djcelery.setup_loader()
 
-CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
-BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
-#BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/2.1/howto/static-files/
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
@@ -134,6 +132,29 @@ STATIC_URL = '/static/'
 
 
 WWW_DIR = os.path.join(BASE_DIR, 'www/')
+
+# Searching
+MIRROR_PRIORITIES = [
+    'simple-otr-mirror.de',
+    'otr.datenkeller.net',
+]
+
+FORMAT_PRIORITIES = [
+    'HD',
+    'HQ',
+    'AVI',
+    'MP4',
+]
+
+# Workers / Message Queue
+CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
+#BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/2.1/howto/static-files/
+
+# Downloading
+DATENKELLER_QUEUE_REFRESH = 20
 
 # Decryption
 OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")

@@ -11,6 +11,11 @@ format2codec = {
   'mpg.avi': ['-c:v', 'mpeg4', '-tag:v', 'DX50'],
   'mpg.mp4': ['-c:v', 'h264', '-tag:v', 'avc1'],
 }
+ffmpeg_general_options = [
+  '-hide_banner',
+  '-loglevel', 'warning',
+  '-stats'
+]
 
 def get_codec(video):
   m = re.search("TVOON_[A-Z]+\.([.A-Za-z0-9]+)$", video)
@@ -37,7 +42,8 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
   extra_flags = []
   if video.endswith(".avi"):
     extra_flags += ["-fflags", "+genpts"]
-  args = [encoder, '-hide_banner']
+  args = [encoder]
+  args += ffmpeg_general_options
   #   args += ['-noaccurate_seek']
   # if not transcode:
   args += ['-ss', str(start)]
