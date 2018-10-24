@@ -107,7 +107,6 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
         if not keepTemp:
             print("Removing video base at " + os.path.abspath(video_base))
             shutil.rmtree(video_base)
-            os.rmdir(video_base)
     else:
         print("Cutting failed!")
 
