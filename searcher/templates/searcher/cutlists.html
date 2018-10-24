@@ -13,7 +13,7 @@
 
     </table>
     <script type="text/javascript">
-      $.getJSON("{% url 'cutlist' 'test' %}", function(data) {
+      $.getJSON("{% url 'searcher:cutlist' 'test' %}", function(data) {
         items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
         $.each(data.items, function (key, item) {
           row = '<tr>';

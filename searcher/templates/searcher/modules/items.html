@@ -28,7 +28,7 @@
       $('.collapse-{{ num }}:first').on('show.bs.collapse', function() {
         $('#more-{{ num }}').remove();
         {% endif %}
-      $.getJSON("{% url 'cutlist' item.file_decrypted %}", function(data) {
+      $.getJSON("{% url 'searcher:cutlist' item.file_decrypted %}", function(data) {
         items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
         console.log(data.items)
         $.each(data.items, function (key, item) {
