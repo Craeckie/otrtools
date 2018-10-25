@@ -110,7 +110,7 @@ def parsePage(p, search, min_dur, key_names):
     titles = []
     otrkeys = _getOtrkeys(p, search)
     (keys, names) = key_names
-    print(f"{len(keys)}, {len(names)}")
+    # print(f"{len(keys)}, {len(names)}")
 
     for otrkey in otrkeys:
       file = otrkey['file']

@@ -6,6 +6,7 @@ from itertools import groupby
 from datetime import timedelta
 from operator import itemgetter, attrgetter
 
+from otrtools.views import BaseView
 from .otrkeyfinder import Title, get_titles, refreshKeys, toOTRName
 from .episode_lists import get_episodes
 from .forms import MovieIndexForm, SeriesIndexForm
@@ -30,65 +31,68 @@ def group_titles(titles):
         res.append(Title(k, time, values, isSimilarDecoded, num)) #{'title': k, 'length': time, 'items':list(values)})
     return res
 
-def index(request):
-    grouped = []
-    if request.method == 'POST':
-        form = MovieIndexForm(request.POST)
-        if form.is_valid():
-            query = form.cleaned_data.get("query")
-            min_duration = form.cleaned_data.get('min_duration')
-            max_page = form.cleaned_data.get("max_page")
-            start_page = form.cleaned_data.get("start_page")
 
-            refreshKeys()
-            titles = get_titles(
-                search=query,
-                page_start=start_page,
-                page_num=max_page,
-                min_dur=min_duration)
-            grouped = group_titles(titles)
-    else:
-        form = MovieIndexForm()
-    ctx = {
-        'titles': grouped,
-        'form': form,
-    }
-    return render(request, 'searcher/index.html', ctx)
+class MovieView(BaseView):
+    template_name = 'searcher/movies.html'
+    form_class = MovieIndexForm
 
-def imdb_index(request):
-    episodes = []
+    def form_valid(self, form, **kwargs):
+        query = form.cleaned_data.get("query")
+        min_duration = form.cleaned_data.get('min_duration')
+        max_page = form.cleaned_data.get("max_page")
+        start_page = form.cleaned_data.get("start_page")
 
-    if request.method == 'POST':
-        form = SeriesIndexForm(request.POST)
-        if form.is_valid():
-            url = form.cleaned_data.get("url")
-            website = form.cleaned_data.get('website')
-            series = form.cleaned_data.get("series")
+        refreshKeys()
+        titles = get_titles(
+            search=query,
+            page_start=start_page,
+            page_num=max_page,
+            min_dur=min_duration)
+        grouped = group_titles(titles)
+        ctx = super().get_context_data(**kwargs)
+        ctx['titles'] = grouped
+        return render(self.request, 'searcher/movies.html', ctx)
+    # def request()
+    # grouped = []
+    # if request.method == 'POST':
+    #     form = MovieIndexForm(request.POST)
+    #     if form.is_valid():
+    #
+    # else:
+    #     form = MovieIndexForm()
 
-            # titles = get_titles(search=q, page_start=0, page_num=50, min_dur=40)
-            # grouped = group_titles(titles)
-            episodes = get_episodes(website, url)
-            refreshKeys()
-            for e in episodes:
-                title = toOTRName(e['title'])
-                query = toOTRName(series)
-                results = get_titles(search=f"{query} {title}", page_start=0, page_num=1, min_dur=40)
-                e['otr'] = results
-                e['decoded'] = any(r for r in results if r['isDecoded'])
-                cur_url = e['url']
-                e['url'] = urllib.parse.urljoin(url, cur_url)
+class SeriesView(BaseView):
+    template_name = 'searcher/series.html'
+    form_class = SeriesIndexForm #MovieIndexForm
+    def form_valid(self, form, **kwargs):
+        url = form.cleaned_data.get("url")
+        website = form.cleaned_data.get('website')
+        series = form.cleaned_data.get("series")
 
-                # for group in grouped:
-                #     if title.lower() in group.title.lower():
-                #         e['otr'] = group
-                #         break
-    else:
-        form = SeriesIndexForm()
-    ctx = {
-        'episodes': episodes,
-        'form': form
-    }
-    return render(request, 'searcher/imdb.html', ctx)
+        # titles = get_titles(search=q, page_start=0, page_num=50, min_dur=40)
+        # grouped = group_titles(titles)
+        episodes = get_episodes(website, url)
+        refreshKeys()
+        for e in episodes:
+            title = toOTRName(e['title'])
+            query = toOTRName(series)
+            results = get_titles(search=f"{query} {title}", page_start=0, page_num=1, min_dur=40)
+            e['otr'] = results
+            e['decoded'] = any(r for r in results if r['isDecoded'])
+            cur_url = e['url']
+            e['url'] = urllib.parse.urljoin(url, cur_url)
+
+            # for group in grouped:
+            #     if title.lower() in group.title.lower():
+            #         e['otr'] = group
+            #         break
+        return render(request, 'searcher/series.html', ctx)
+    # else:
+    #     form = SeriesIndexForm()
+    # ctx = {
+    #     'episodes': episodes,
+    #     'form': form
+    # }
 
 def cutlist_test(request):
     return render(request, 'searcher/cutlists.html', {})

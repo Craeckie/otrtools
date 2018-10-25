@@ -1,0 +1,65 @@
+{% extends 'searcher/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block header %}
+  {% include 'searcher/modules/header.html' with title="Add Manually" %}
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- <link rel="stylesheet" href="{% static 'downloader/css/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'downloader/css/skeleton.css' %}"> -->
+{% endblock %}
+
+{% block navbar %}
+  {% include 'searcher/modules/navbar.html' with page="add" %}
+{% endblock %}
+{% block content %}
+<!-- Primary Page Layout
+–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<div class="container">
+  <div class="row">
+    <div class="col-lg-6" style="margin-left: 30px; margin-top: 8%; width: 85%; max-width: 650px;">
+      <h4>OTR Downloader</h4>
+      <p>The OTR Downloader initiates the process of downloading the video files, decoding them (merging audio/video), downloading the cutlist, cutting the video in pieces and merging it into the final video.</p>
+      
+      {% if failed %}
+        <p>Processing failed! :(</p>
+      {% endif %}
+      {% if started %}
+        Progress: <br>
+        <script>
+        function loadLog() {
+          $("#log").load("<?php echo $logbase; ?>/read-log.php");
+          $("#log").scrollTop($("#log")[0].scrollHeight);
+        }
+        setInterval(loadLog, 1000)
+        </script>
+        <p>
+        <button onclick="javascript:location.href='<?php echo $logbase; ?>'" class="btn pull-right"><i class="glyphicon glyphicon-resize-full"></i></button>
+        <pre id="log" style="height: 500px; width: 725px;">
+        </pre>
+        <br>
+        When finished you can download it <a href="#">here');
+        </a>.
+        </p>
+        <br>
+      {% else %}
+        <p>Start the process here:</p>
+      {% endif %}
+      {% crispy form %}
+    <br><br>
+    <div class="panel-footer">
+      <p>Free space on server:
+          ToDo
+      </p>
+    </div>
+  </div>
+</div>
+
+</div>
+
+{% endblock %}

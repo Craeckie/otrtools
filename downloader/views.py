@@ -1,41 +1,31 @@
 from django.shortcuts import render
-from django.http import HttpResponse
-from .process import process
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
-# Create your views here.
-def add(request):
-    if request.method.lower() == "post":
-        video = request.POST.get("Video")
-        audio = request.POST.get("Audio")
-        cutlist = request.POST.get("Cutlist")
-        mega = request.POST.get("Mega", False)
-        if video and cutlist:
-            ctx = {}
-            if not process.delay(video, cutlist, audio_url=audio, mega=mega, keep=False):
-                ctx['failed'] = True
-            return render(request, 'downloader/index.html', {})
-        # function process($video, $audio, $cutlist, $mega) {
-        #   $mega_param = $mega == "yes" ? "-m" : "";
-        #   $output = shell_exec("run_process $mega_param \"$video\" \"$audio\" \"$cutlist\"");
-        #   $key = "Otrkey: ";
-        #   $key_len = strlen($key);
-        #   foreach(preg_split("/((\r?\n)|(\r\n?))/", $output) as $line) {
-        #     if (substr($line, 0, $key_len) === $key) {
-        #       $otrkey = substr($line, $key_len);
-        #       break;
-        #     }
-        #   }
-        #   $output = substr($output, 0, strlen($output) - 1); // remvoe last newline
-        #
-        #   $output = nl2br($output);
-        #   //echo "<code>Otrkey:" . $otrkey . "<br>";
-        #   echo $output . "</code><br><br>";
-        #   return $otrkey;
-        # }
-    elif request.method.lower() == "get":
-        return render(request, 'downloader/index.html', {
-          'video': request.GET.get("Video", ""),
-          'audio': request.GET.get("Audio", ""),
-          'cutlist': request.GET.get("Cutlist", "")
-        })
-        #return HttpResponse("Hello, world. You're at the downloader.")
+from otrtools.views import BaseView
+from .process import process
+from .forms import AddForm
+
+class AddView(BaseView):
+    template_name = 'downloader/add.html'
+    form_class = AddForm
+
+    def form_valid(self, form, **kwargs):
+        video = form.cleaned_data.get("video")
+        audio = form.cleaned_data.get("audio")
+        cutlist = form.cleaned_data.get("cutlist")
+        keep = form.cleaned_data.get("keep")
+        mega = form.cleaned_data.get("Mega", False)
+        ctx = self.get_context_data(**kwargs)
+        if not process.delay(video, cutlist, audio_url=audio, mega=mega, keep=keep):
+            ctx['failed'] = True
+
+        return HttpResponseRedirect(reverse('downloader:add')) #render(self.request, 'downloader/add.html', ctx)
+
+    def get_initial(self):
+        initial = super().get_initial()
+
+        initial['video'] = self.request.GET.get("video", "")
+        initial['audio'] = self.request.GET.get("audio", "")
+        initial['cutlist'] = self.request.GET.get("cutlist", "")
+        return initial

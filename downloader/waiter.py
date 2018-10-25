@@ -3,6 +3,7 @@
 import time, re, argparse
 from urllib.parse import urlparse
 import requests
+from django.conf import settings
 
 url="https://otr.datenkeller.net/?getFile=The_100__Praimfaya_17.05.24_21-00_uswpix_60_TVOON_DE.mpg.HD.avi.otrkey"
 

@@ -6,5 +6,5 @@ from . import views
 app_name = 'downloader'
 
 urlpatterns = [
-    url(r'^add/', views.add, name='add'),
+    url(r'^add/', views.AddView.as_view(), name='add'),
 ]

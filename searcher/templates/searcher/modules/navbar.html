@@ -1,0 +1,45 @@
+{% load crispy_forms_tags %}
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <a class="navbar-brand" href="{% if page == "movies" %}#{% else %}{% url 'searcher:movies' %}{% endif %}">OTR Tools</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item{% if page == "movies" %} active{% endif %}">
+        <a class="nav-link" href="{% if page == "movies" %}#{% else %}{% url 'searcher:movies' %}{% endif %}">Movies <span class="sr-only">(current)</span></a>
+      </li>
+      <li class="nav-item{% if page == "series" %} active{% endif %}">
+        <a class="nav-link" href="{% if page == "series" %}#{% else %}{% url 'searcher:series' %}{% endif %}">Series</a>
+      </li>
+      <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Tools
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+          <a class="dropdown-item{% if page == "add" %} active{% endif %}" href="{% if page == "add" %}#{% else %}{% url 'downloader:add' %}{% endif %}">Add Manually</a>
+          <a class="dropdown-item" href="#">Show logs..</a>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a>
+        </div>
+      </li>
+    </ul>
+    {% comment %}
+    <form class="form-inline my-2 my-lg-0" action="{% url 'searcher:movies' %}" method="post">
+      {% csrf_token %}
+      <!-- <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"> -->
+
+      <!-- <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button> -->
+    </form>
+    {% endcomment %}
+    <form class="form-inline my-2 my-lg-0" action="{% url 'searcher:movies' %}" method="post">
+        {% csrf_token %}
+        <input name="{{nav_form.query.name}}" class="form-control textinput mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        {{ nav_form.min_duration|as_crispy_field }}
+        {{ nav_form.max_page|as_crispy_field }}
+        {{ nav_form.start_page|as_crispy_field }}
+        <button type="submit" class="btn btn-success">Search</button>
+    </form>
+  </div>
+</nav>
