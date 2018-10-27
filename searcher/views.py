@@ -1,15 +1,17 @@
 # coding: utf-8
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse
+from django.views.generic.edit import CreateView
 import urllib.parse, requests
 from itertools import groupby
 from datetime import timedelta
 from operator import itemgetter, attrgetter
 
 from otrtools.views import BaseView
-from .otrkeyfinder import Title, get_titles, refreshKeys, toOTRName
+from .otrkeyfinder import Title, getTitles, refreshKeys, toOTRName
 from .episode_lists import get_episodes
 from .forms import MovieIndexForm, SeriesIndexForm
+from .models import Series
 
 sortkeyfn = lambda t:t['title']
 
@@ -43,7 +45,7 @@ class MovieView(BaseView):
         start_page = form.cleaned_data.get("start_page")
 
         refreshKeys()
-        titles = get_titles(
+        titles = getTitles(
             search=query,
             page_start=start_page,
             page_num=max_page,
@@ -60,6 +62,10 @@ class MovieView(BaseView):
     #
     # else:
     #     form = MovieIndexForm()
+class AddSeriesView(CreateView):
+    model = Series
+    form_class = SeriesIndexForm
+
 
 class SeriesView(BaseView):
     template_name = 'searcher/series.html'
@@ -69,14 +75,14 @@ class SeriesView(BaseView):
         website = form.cleaned_data.get('website')
         series = form.cleaned_data.get("series")
 
-        # titles = get_titles(search=q, page_start=0, page_num=50, min_dur=40)
+        # titles = getTitles(search=q, page_start=0, page_num=50, min_dur=40)
         # grouped = group_titles(titles)
-        episodes = get_episodes(website, url)
+        episodes = get_episodes(website, url, series)
         refreshKeys()
         for e in episodes:
             title = toOTRName(e['title'])
             query = toOTRName(series)
-            results = get_titles(search=f"{query} {title}", page_start=0, page_num=1, min_dur=40)
+            results = getTitles(search=f"{query} {title}", page_start=0, page_num=1, min_dur=40)
             e['otr'] = results
             e['decoded'] = any(r for r in results if r['isDecoded'])
             cur_url = e['url']
@@ -86,13 +92,14 @@ class SeriesView(BaseView):
             #     if title.lower() in group.title.lower():
             #         e['otr'] = group
             #         break
-        return render(request, 'searcher/series.html', ctx)
+        ctx = self.get_context_data(**kwargs)
+        ctx.update({
+            'episodes': episodes,
+            'form': form
+        })
+        return render(self.request, 'searcher/series.html', ctx)
     # else:
     #     form = SeriesIndexForm()
-    # ctx = {
-    #     'episodes': episodes,
-    #     'form': form
-    # }
 
 def cutlist_test(request):
     return render(request, 'searcher/cutlists.html', {})
@@ -146,13 +153,13 @@ def cutlist(request, file):
   #    'hasMore': False,
   #    'currentPage': 0}
     data = '{"conds":[{"query":"%s","field":"name"}],"isOrConnection":false,"sortBy":"datebroadcast","isAsc":true,"page":0}' % file
-    print(data)
+    # print(data)
     resp = requests.post('http://www.cutlist.at/api/search-by', data=data)
     json = resp.json()
-    print(json)
+    # print(json)
     items = [dict(item) for item in json['items']]
     items = sorted(items, key=itemgetter('hits'), reverse=True)
     items = sorted(items, key=lambda item: item['rating']['avg'] * min(5, item['rating']['n']), reverse=True)
-    print(items)
+    # print(items)
     # return JsonResponse(resp.json())
     return JsonResponse({'items': items})

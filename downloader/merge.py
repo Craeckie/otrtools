@@ -3,7 +3,10 @@ import re, os, subprocess
 from django.conf import settings
 
 
-def merge(video, audio, dest):
+def merge(video, audio, video_base):
+    dest = os.path.join(video_base, "merge." + settings.CUT_EXT)
+
+
     if os.path.exists(dest):
         print("Destination already exists, removing..")
         os.path.remove(dest)
@@ -38,9 +41,17 @@ def merge(video, audio, dest):
     return_code = prc.wait()
     if return_code == 0 and os.path.exists(dest):
         print("Merge successful!")
-        return True
+        print(f"Removing video{video}) and audio({audio})")
+        os.remove(video)
+        os.remove(audio)
+        # print(f"Using merge ({tmp_merge_name}) as video")
+        # video = tmp_merge_name
+        # video = os.path.splitext(video)[0] + "." + settings.CUT_EXT
+        print(f"Moving merged video: {dest}->{video}")
+        os.rename(dest, video)
+        return video
     else:
         print(f"Merging failed!")
         if err:
           print(f"Error: {err}")
-        return False
+        return None

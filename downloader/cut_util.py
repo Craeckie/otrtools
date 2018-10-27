@@ -240,7 +240,7 @@ def parse_base_name(filename):
     basename_match = re.search('(?P<name>[a-zA-Z0-9_-]+_[0-9]{2}\.[0-9]{2}\.[0-9]{2}_[0-9]{2}-[0-9]{2}_[0-9A-Za-z-]+_[0-9]+_TVOON_DE)(?P<extension>[A-Za-z0-9.]+)', filename)
     return basename_match
 
-def get_real_name(filename, extension):
+def get_real_name(filename, extension, isUncut=False):
     dest_path = filename + extension
     filename_match = parse_media_name(filename)
     if filename_match:
@@ -250,8 +250,13 @@ def get_real_name(filename, extension):
       sender = filename_match.group("sender")
 
       if sender.startswith("uk") or sender.startswith("us"):
-          actual_filename += " (engl)"
+          if isUncut:
+              actual_filename += " (engl, uncut)"
+          else:
+              actual_filename += " (engl)"
           print("Is english, new name: %s" % actual_filename)
+      elif isUncut:
+          actual_filename += " (uncut)"
 
       dest_path = actual_filename + '.' + extension #os.path.splitext(video)[0] + ".cut.avi"
     else:

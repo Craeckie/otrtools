@@ -12,16 +12,23 @@
 {% block content %}
   <div class="container">
     <h1>Series</h1>
+    <h3>Select a series:</h3>
+    <div class="">
+        {% for s in series %}
+
+        {% endfor %}
+    </div>
+
     {% crispy form %}
     <table class="table table-striped">
       {% for e in episodes %}
         <tr>
-          <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a target="_blank" href="{{ e.url }}">{{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
+          <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a target="_blank" href="{{ e.url }}">{{ e.season }}x{{ e.episode }} {{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
           {% if 'otr' in e %}
           <td>
             {% with e.otr as titles %}
             <table class="table table-striped">
-              {% include "searcher/modules/items.html" with items=titles num=forloop.counter %}
+              {% include "searcher/modules/items.html" with items=titles num=forloop.counter destName=e.destName %}
             </table>
             {% endwith %}
           </td>

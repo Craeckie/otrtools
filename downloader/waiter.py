@@ -29,6 +29,7 @@ def _datenkeller(url, otrkey=None):
         filename = match.group(3)
         dl_url = "http://" + server + "/" + access_id + "/" + filename
         print("Url: " + dl_url, flush=True)
+        print("Just waiting another 5 seconds..")
         time.sleep(5)
         return (dl_url, otrkey)
       else:

@@ -21,13 +21,16 @@ def format2label(f):
       return None
 
 @register.simple_tag
-def cutlist_call(item, i, num):
+def cutlist_call(item, i, num, destName=None):
     return mark_safe('loadCutlists(%s)' % \
       ', '.join(map(lambda x: f"'{x}'",
-        [reverse('searcher:cutlist', kwargs={'file': item['file_decrypted']}),
-         quote(item['chosen_mirror']['link']),
-         item['chosen_mirror']['name'],
-         f'#cutlist-table-{num}-{i}'])))
+        [
+          reverse('searcher:cutlist', kwargs={'file': item['file_decrypted']}),
+          quote(destName) if destName else '',
+          quote(item['chosen_mirror']['link']),
+          item['chosen_mirror']['name'],
+          f'#cutlist-table-{num}-{i}',
+        ])))
       # "{{ item.chosen_mirror.link|urlencode }}",
       # "{{ item.chosen_mirror.name }}",
       # "#cutlist-table-{{ num }}-{{ forloop.counter }}");"

@@ -14,10 +14,11 @@ class AddView(BaseView):
         video = form.cleaned_data.get("video")
         audio = form.cleaned_data.get("audio")
         cutlist = form.cleaned_data.get("cutlist")
+        dest = form.cleaned_data.get("dest")
         keep = form.cleaned_data.get("keep")
-        mega = form.cleaned_data.get("Mega", False)
+        # mega = form.cleaned_data.get("Mega", False)
         ctx = self.get_context_data(**kwargs)
-        if not process.delay(video, cutlist, audio_url=audio, mega=mega, keep=keep):
+        if not process.delay(video, cutlist, audio_url=audio, destName=dest, keep=keep):
             ctx['failed'] = True
 
         return HttpResponseRedirect(reverse('downloader:add')) #render(self.request, 'downloader/add.html', ctx)
@@ -28,4 +29,5 @@ class AddView(BaseView):
         initial['video'] = self.request.GET.get("video", "")
         initial['audio'] = self.request.GET.get("audio", "")
         initial['cutlist'] = self.request.GET.get("cutlist", "")
+        initial['dest'] = self.request.GET.get("dest", "")
         return initial

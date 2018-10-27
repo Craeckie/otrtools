@@ -38,9 +38,9 @@ def add_download_list(listfile, url, dest_path, filename):
       f.write(f"{url}\n dir={dest_path}\n out={filename}\n")
       return listfile
 
-def download(listfile, video_url, audio_url=None):
+def download(listfile, video, dest_path, audio=None):
     dl_parts = 4
-    if any('otr-files.de/' in url for url in [video_url, audio_url] if url):
+    if any('otr-files.de/' in url for url in [video.url, audio.url if audio else None] if url):
         dl_parts = 1
     args = [
       'aria2c',
@@ -54,18 +54,33 @@ def download(listfile, video_url, audio_url=None):
       '--continue=true',
       '-i', listfile]
     print(' '.join(args))
-    prc = subprocess.Popen(args, stdout=subprocess.PIPE)
-    for line in iter(prc.stdout.readline, ""):
-        if prc.poll() != None:
-          print(f"Poll is {prc.poll()}!")
-          break
-        text = line.decode().replace('\n', '')
-        if text.startswith("["):
-          print(text, end='\r')
-    print("Process exited!")
-    print("")
-    prc.stdout.close()
-    return_code = prc.wait()
+
+    for i in range(3):
+        prc = subprocess.Popen(args, stdout=subprocess.PIPE)
+        for line in iter(prc.stdout.readline, ""):
+            if prc.poll() != None:
+              # print(f"Poll is {prc.poll()}!")
+              break
+            text = line.decode().replace('\n', '')
+            if text.startswith("["):
+              print(text, end='\r')
+        print("Process exited!")
+        print("")
+        prc.stdout.close()
+        return_code = prc.wait()
+        if return_code == 0:
+            return return_code
+        else:
+            print("Download failed! Removing downloaded and trying again..")
+            try:
+                os.remove(video.get_otrkey(dest_path))
+            except FileNotFoundError:
+                pass
+            if audio:
+                try:
+                  os.remove(audio.get_otrkey(dest_path))
+                except FileNotFoundError:
+                    pass
     return return_code
 
 def amazon_upload(file):

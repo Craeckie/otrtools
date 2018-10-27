@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 from urllib import parse
 from .decrypt import getDecryptedName, decrypt
 from .download_util import prepare_download, download
-from .cut_util import parse_base_name, parse_media_name
+from .cut_util import parse_base_name, parse_media_name, get_real_name
 from .cut import cut
 from django.conf import settings
 
@@ -36,7 +36,7 @@ class MediaInformation:
         return getDecryptedName(otrkey)
 
 @shared_task
-def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
+def process(video_url, cutlist, audio_url=None, destName=None, keep=False):
     if not os.path.exists(temp_path): os.mkdir(temp_path)
     video = MediaInformation(video_url)
 
@@ -72,12 +72,17 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     print(f"Video:\t{video_url}")
     if audio:
         print(f"Audio:\t{audio_url}")
-    print(f"Cutlist:\t{cutlist}")
+    if cutlist:
+        print(f"Cutlist:\t{cutlist}")
+    else:
+        print("Culist: None!")
+    if destName:
+        print(f"Destination:\t{destName}")
 
     listfile = prepare_download(video, dest_path=dest_path, audio=audio)
 
     # if requiresDownload:
-    if download(listfile, video_url, audio_url=audio_url) != 0:
+    if download(listfile, video, dest_path=dest_path, audio=audio) != 0:
       print("Download failed! :(")
       return False
     else:
@@ -102,18 +107,28 @@ def process(video_url, cutlist, audio_url=None, mega=False, keep=False):
     #if audio:
     #    audio_path = os.path.join(dest_path, audio)
 
-    print("Starting cutting..")
-    if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None):
-        if mega:
-            if amazon_upload(dest):
-                print("Succesfully uploaded, removing video")
-                os.remove(dest_path)
-            else:
-                return False
-        return True
+    if cutlist:
+        print("Starting cutting..")
+        if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None, destName=destName):
+            return True
+        else:
+            print("Cutting failed!")
+            return False
     else:
-        print("Cutting failed!")
-        return False
+        print("Not cutting!")
+        # If audio file passed, merge it with video
+        if audio:
+          dest = merge(video, audio, video_base)
+          if not dest:
+              return False
+          else:
+              video = dest
+        if not destName:
+            destName = get_real_name(video, settings.DEST_EXT, isUncut=True)
+        destPath = os.path.abspath(os.path.join(settings.DEST_DIR, destName))
+        shutil.move(video, destPath)
+        print(f"Video saved to {destPath}")
+        return True
 
 def main():
     parser = ArgumentParser()
@@ -141,12 +156,12 @@ def main():
       print("A cutlist URL must be provided!")
       return False
 
-    mega = False
-    if args.m:
-      mega = True
-      mega_path = "--path=" + os.environ['mega_path']
+    # mega = False
+    # if args.m:
+    #   mega = True
+    #   mega_path = "--path=" + os.environ['mega_path']
 
-    return process(video_url, cutlist, audio_url, mega)
+    return process(video_url, cutlist, audio_url)
 
 if __name__ == 'main':
     if not main():

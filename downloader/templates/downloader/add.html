@@ -20,12 +20,12 @@
 {% block content %}
 <!-- Primary Page Layout
 –––––––––––––––––––––––––––––––––––––––––––––––––– -->
-<div class="container">
+<main class="container" role="main">
   <div class="row">
-    <div class="col-lg-6" style="margin-left: 30px; margin-top: 8%; width: 85%; max-width: 650px;">
-      <h4>OTR Downloader</h4>
-      <p>The OTR Downloader initiates the process of downloading the video files, decoding them (merging audio/video), downloading the cutlist, cutting the video in pieces and merging it into the final video.</p>
-      
+    <div class="col-md-8" style="margin-left: 30px; width: 85%; max-width: 650px;">
+      <h2>Downloader</h1>
+      <p>The Downloader initiates the process of downloading the video files, decoding them (merging audio/video), downloading the cutlist, cutting the video in pieces and merging it into the final video.</p>
+
       {% if failed %}
         <p>Processing failed! :(</p>
       {% endif %}
@@ -51,15 +51,15 @@
         <p>Start the process here:</p>
       {% endif %}
       {% crispy form %}
-    <br><br>
-    <div class="panel-footer">
-      <p>Free space on server:
-          ToDo
-      </p>
+      <br><br>
     </div>
   </div>
-</div>
+</main>
 
-</div>
+<footer class="footer">
+  <div class="container">
+    <span class="text-muted">Free space on server: ToDo</span>
+  </div>
+</footer>
 
 {% endblock %}

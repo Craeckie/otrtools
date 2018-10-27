@@ -12,7 +12,7 @@ from .cutlist import get_cutlist
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
-def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
+def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=False):
     if not os.path.exists(video_base):
       os.mkdir(video_base)
     cutlist = get_cutlist(cutlist_path, video_base)
@@ -24,18 +24,11 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
 
     # If audio file passed, merge it with video
     if audio:
-      tmp_merge_name = os.path.join(video_base, "merge." + settings.CUT_EXT)
-      if not merge(video, audio, tmp_merge_name):
+      dest = merge(video, audio, video_base)
+      if not dest:
           return False
-      print(f"Removing video{video}) and audio({audio})")
-      os.remove(video)
-      os.remove(audio)
-      # print(f"Using merge ({tmp_merge_name}) as video")
-      # video = tmp_merge_name
-      # video = os.path.splitext(video)[0] + "." + settings.CUT_EXT
-      print("Moving merged video(" + tmp_merge_name + "->" + video)
-      os.rename(tmp_merge_name, video)
-
+      else:
+          video = dest
     # Get list of key frames
     print("Searching all keyframes..")
 
@@ -55,16 +48,17 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
         print(f"Cutting failed!")
         traceback.print_exc()
 
-    dest_path = None
     if cut_files:
         if len(cut_files) == 0: # No cut in cutlist
           print("Error: No cuts found in cutlist!")
           return False
         if not os.path.exists(settings.DEST_DIR):
           os.mkdir(settings.DEST_DIR)
-        dest_path = os.path.abspath(os.path.join(settings.DEST_DIR, get_real_name(video, settings.DEST_EXT)))
+        if not destName:
+            destName = get_real_name(video, settings.DEST_EXT)
+        destPath = os.path.abspath(os.path.join(settings.DEST_DIR, destName))
 
-        print(f'Saving to "{dest_path}"')
+        print(f'Saving to "{destPath}"')
         if len(cut_files) > 1:
           # concatenate the cuts
           extra_flags = []
@@ -83,7 +77,7 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
             '-c:a', 'copy',
             '-map', '0',
             '-metadata', 'comment=' + meta_comment,
-            '-y', dest_path]
+            '-y', destPath]
           print("Arguments: %s" % str(args))
           res = subprocess.call(args);
 
@@ -100,25 +94,25 @@ def cut(video, cutlist_path, video_base, audio=None, keepTemp=False):
 
         elif len(cut_files) == 1:
           print("Only one cut, just moving cut file")
-          shutil.move(cut_files[0], dest_path)
+          shutil.move(cut_files[0], destPath)
 
         # Fix permissions?
-        # shutil.chown(dest_path, user="www-data", group="www-data")
+        # shutil.chown(destPath, user="www-data", group="www-data")
         if not keepTemp:
             print("Removing video base at " + os.path.abspath(video_base))
             shutil.rmtree(video_base)
     else:
         print("Cutting failed!")
 
-    print(f"Video saved to {dest_path}")
+    print(f"Video saved to {destPath}")
 
-    return dest_path
+    return destPath
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--mega",
-                        help="Set to upload video to MEGA",
-                        action="store_true")
+    # parser.add_argument("-m", "--mega",
+    #                     help="Set to upload video to MEGA",
+    #                     action="store_true")
     parser.add_argument("-d", "--decrypt",
                         help="Set to decrypt the given otrkey file",
                         action="store_true")
@@ -184,18 +178,10 @@ if __name__ == '__main__':
 
     # os.chdir(video_base)
 
-    dest = cut(video, cutlist, video_base, audio, args.keep)
+    dest = cut(video, cutlist, video_base, audio, keepTemp=args.keep)
 
     if dest:
-        if args.mega:
-            mega_path = "--path=" + os.environ['mega_path']
-            if amazon_upload(dest):
-                print("Succesfully uploaded, removing video")
-                os.remove(dest_path)
-            else:
-                sys.exit(1)
-        else:
-          print("Not uploading to mega, keeping video file")
+        print(f"Cutting finished! Saved to {dest}")
     else:
         print("Cutting failed!")
         sys.exit(1)

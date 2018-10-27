@@ -45,7 +45,7 @@ def loadKeys():
 
 
     print(f"Loading keys.. found {len(keys)} keys with {len(names)} names")
-    return (keys, names)
+    return (keys, list(names))
 def refreshKeys():
     loadKeys.cache_clear()
 
@@ -55,15 +55,10 @@ def toOTRName(name):
       .replace(':', ' ') \
       .replace('.', '_') \
       .replace('\'', '_') \
-      .replace(',', '_') \
+      .replace(',', ' ') \
       .replace('?', '')
 
-@lru_cache(maxsize=1024)
-def _getOtrkeys(p, search):
-    print(f"Retreiving page: {p} for search '{search}'")
-    r = requests.get('https://otrkeyfinder.com/en/?search=%s&order=date-name&page=%s' % (search, p))
-    b = BeautifulSoup(r.text, 'html.parser')
-    otrkey_divs = b.find_all('div', { 'class': 'otrkey'})
+def parseOtrkeys(otrkey_divs):
     files = []
     for otrkey_div in otrkey_divs:
         file_spans = otrkey_div.find_all('span', { 'class': 'file' })
@@ -94,8 +89,6 @@ def _getOtrkeys(p, search):
             })
         else:
             print(f"Error: couldn't find a 'file' span in {otrkey_div}")
-    # if spans:
-    #     files = [s.string for s in spans]
     return files
 
 format_name = {
@@ -106,9 +99,8 @@ format_name = {
   'mpg.HD.ac3' : 'AC3',
 }
 
-def parsePage(p, search, min_dur, key_names):
+def parseTitles(otrkeys, min_dur, key_names):
     titles = []
-    otrkeys = _getOtrkeys(p, search)
     (keys, names) = key_names
     # print(f"{len(keys)}, {len(names)}")
 
@@ -126,6 +118,7 @@ def parsePage(p, search, min_dur, key_names):
               format = format_name[format]
           isDecoded = file.replace('.otrkey', '') in keys
           isSimilarDecoded = title in names
+
           mirrors = otrkey['mirrors']
           if len(mirrors) > 0:
             chosen_mirror = mirrors[0]
@@ -157,12 +150,46 @@ def parsePage(p, search, min_dur, key_names):
         print("Error parsing %s!" % file)
     return sorted(titles, key=itemgetter('priority'))
 
-def get_titles(search, page_start=0, page_num=20, min_dur=60):
-    #print(f"Search: {search}, start: {page_start}, num: {page_num}")
-    #for p in :
-    key_names = loadKeys()
-    pages = range(page_start*page_num + 1, (page_start + 1) * page_num + 1)
-    with Pool(4) as p:
-      titles = list(chain.from_iterable(p.starmap(parsePage, zip(pages, repeat(search.lower()), repeat(min_dur), repeat(key_names)))))
-    titles.sort(key=sortkeyfn)
+@lru_cache(maxsize=1024)
+def getTitles(
+    search,
+    page_start=1,
+    page_num=20,
+    min_dur=60,
+    isFirstPage=True,
+    key_names=None):
+
+    if not key_names:
+      key_names = loadKeys()
+
+    print(f"Retreiving page: {page_start} for search '{search}'")
+    r = requests.get('https://otrkeyfinder.com/en/?search=%s&order=date-name&page=%s' % (search, page_start))
+    b = BeautifulSoup(r.text, 'html.parser')
+
+    otrkey_divs = b.find_all('div', { 'class': 'otrkey'})
+    files = parseOtrkeys(otrkey_divs)
+
+    titles = parseTitles(files, min_dur, key_names)
+    if isFirstPage:
+        key_names = loadKeys()
+        last_page_num = 0
+        page_list = b.find('ul', {'class': 'pagination'})
+        if page_list: # has any pages?
+            last_page_li = b.find('li', { 'class': 'last'})
+            last_page_num = int(last_page_li.a.attrs['data-page']) + 1 # data-page is zero-based..
+            print(f"Last page: {last_page_num}")
+            first_page = min((page_start - 1)*page_num + 2, last_page_num)
+            last_page = min((page_start + 1) * page_num + 1, last_page_num + 1)
+            print(f"Page range: {first_page} -> {last_page}")
+            pages = range(first_page, last_page)
+            with Pool(4) as p:
+              titles.extend(chain.from_iterable(p.starmap(getTitles, zip(
+                  repeat(search.lower()),
+                  pages,
+                  repeat(page_num),
+                  repeat(min_dur),
+                  repeat(False),
+              ))))
+        titles.sort(key=sortkeyfn)
+    print(f"{page_start}: Found {len(titles)} titles!")
     return titles
