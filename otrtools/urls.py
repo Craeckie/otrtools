@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.views.generic import RedirectView
 from filebrowser.sites import site
 
 import downloader.urls
@@ -22,7 +23,8 @@ import downloader.urls
 urlpatterns = [
     path('admin/filebrowser/', site.urls),
     path('grappelli/', include('grappelli.urls')),
-    path('admin/', admin.site.urls),
-    path('search/', include('searcher.urls')),
-    path('download/', include('downloader.urls')),
+    path('admin/', admin.site.urls, name='admin'),
+    path('search/', include('searcher.urls'), name='searcher'),
+    path('download/', include('downloader.urls'), name='downloader'),
+    path('', RedirectView.as_view(pattern_name='searcher:main'), name='main'),
 ]
