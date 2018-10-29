@@ -52,9 +52,10 @@ def refreshKeys():
 def toOTRName(name):
     return name \
       .replace(' ', '_') \
+      .replace('-', ' ') \
       .replace(':', ' ') \
       .replace('.', '_') \
-      .replace('\'', '_') \
+      .replace('\'', ' ') \
       .replace(',', ' ') \
       .replace('?', '')
 
