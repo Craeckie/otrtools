@@ -18,8 +18,6 @@ class Title:
     def item_count(self):
       return len(self.items)
 
-sortkeyfn = lambda t:t['title']
-
 @lru_cache(maxsize=1)
 def loadKeys():
     path = settings.OTRKEY_CACHE
@@ -153,7 +151,9 @@ def parseTitles(otrkeys, min_dur, key_names):
 
       else:
         print("Error parsing %s!" % file)
-    return sorted(titles, key=itemgetter('priority', 'num_mirrors'))
+    titles = sorted(titles, key=itemgetter('priority'))
+    titles = sorted(titles, key=itemgetter('num_mirrors'), reverse=True)
+    return titles
 
 @lru_cache(maxsize=1024)
 def getTitles(
@@ -195,6 +195,6 @@ def getTitles(
                   repeat(min_dur),
                   repeat(False),
               ))))
-        titles.sort(key=sortkeyfn)
+        titles.sort(key=itemgetter('title'))
     print(f"{page_start}: Found {len(titles)} titles!")
     return titles
