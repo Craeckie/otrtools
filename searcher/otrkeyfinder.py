@@ -84,10 +84,11 @@ def parseOtrkeys(otrkey_divs):
                     print(f"Error: couldn't find a link in {mirror_div}")
                 if mirror:
                     mirrors.append(mirror)
-            files.append({
-                'file': file,
-                'mirrors': sorted(mirrors, key=itemgetter('priority', 'name')),
-            })
+            if mirrors:
+                files.append({
+                    'file': file,
+                    'mirrors': sorted(mirrors, key=itemgetter('priority', 'name')),
+                })
         else:
             print(f"Error: couldn't find a 'file' span in {otrkey_div}")
     return files
@@ -121,17 +122,19 @@ def parseTitles(otrkeys, min_dur, key_names):
           isSimilarDecoded = title in names
 
           mirrors = otrkey['mirrors']
-          if len(mirrors) > 0:
-            chosen_mirror = mirrors[0]
-            found_mirror = False
-            for priority in settings.MIRROR_PRIORITIES:
-                for mirror in mirrors:
-                    if mirror == mirror['name']:
-                        found_mirror = True
-                        chosen_mirror = mirror
-                        break
-                if found_mirror:
-                    break
+          if len(mirrors) == 0:
+            continue
+
+          chosen_mirror = mirrors[0]
+          found_mirror = False
+          for priority in settings.MIRROR_PRIORITIES:
+              for mirror in mirrors:
+                  if mirror == mirror['name']:
+                      found_mirror = True
+                      chosen_mirror = mirror
+                      break
+              if found_mirror:
+                  break
 
           #print(f"File: '{f}', isDecoded: {isDecoded}")
           titles.append({
@@ -140,6 +143,7 @@ def parseTitles(otrkeys, min_dur, key_names):
             'file': file,
             'file_decrypted': file_decrypted,
             'mirrors': mirrors,
+            'num_mirrors': len(mirrors),
             'chosen_mirror': chosen_mirror,
             'format': format,
             'isDecoded': isDecoded,
@@ -149,7 +153,7 @@ def parseTitles(otrkeys, min_dur, key_names):
 
       else:
         print("Error parsing %s!" % file)
-    return sorted(titles, key=itemgetter('priority'))
+    return sorted(titles, key=itemgetter('priority', 'num_mirrors'))
 
 @lru_cache(maxsize=1024)
 def getTitles(
