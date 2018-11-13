@@ -26,6 +26,8 @@ def prepare_download(video, dest_path, audio=None):
         results.append(pool.apply_async(get_dl_url, (audio.url, audio.get_otrkey())))
         # add_download_list(listfile, audio.url, dest_path, audio.get_otrkey())
           # requiresDownload = True
+    if not results:
+        return None
     for r in results:
         (url, otrkey) = r.get()
         print(f"New url: {url} for {otrkey}")

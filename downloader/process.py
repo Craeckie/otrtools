@@ -81,18 +81,20 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False):
 
     listfile = prepare_download(video, dest_path=dest_path, audio=audio)
 
-    # if requiresDownload:
-    if download(listfile, video, dest_path=dest_path, audio=audio) != 0:
-      print("Download failed! :(")
-      return False
-    else:
-      if os.path.exists(video.get_otrkey(dest_path)):
-          print("Download successful! :)")
-          print(f"Removing listfile at {listfile}")
-          os.remove(listfile)
-      else:
-          print("Download finished, but couldn't find downloaded file! :(")
+    if listfile:
+        if download(listfile, video, dest_path=dest_path, audio=audio) != 0:
+          print("Download failed! :(")
           return False
+        else:
+          if os.path.exists(video.get_otrkey(dest_path)):
+              print("Download successful! :)")
+              print(f"Removing listfile at {listfile}")
+              os.remove(listfile)
+          else:
+              print("Download finished, but couldn't find downloaded file! :(")
+              return False
+    else:
+        print("Already decrypted, moving forward")
 
 
     if not os.path.exists(video.get_decrypted(dest_path)):

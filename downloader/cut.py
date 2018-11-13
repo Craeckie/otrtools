@@ -95,6 +95,7 @@ def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=Fal
         elif len(cut_files) == 1:
           print("Only one cut, just moving cut file")
           shutil.move(cut_files[0], destPath)
+        print(f"Video saved to {destPath}")
 
         # Fix permissions?
         # shutil.chown(destPath, user="www-data", group="www-data")
@@ -103,8 +104,6 @@ def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=Fal
             shutil.rmtree(video_base)
     else:
         print("Cutting failed!")
-
-    print(f"Video saved to {destPath}")
 
     return destPath
 
