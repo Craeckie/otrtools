@@ -2,14 +2,30 @@
 import requests, re
 from bs4 import BeautifulSoup
 from django.conf import settings
+from .otrkeyfinder import toOTRName
+from datetime import datetime
+from difflib import SequenceMatcher
 
-def get_episodes(website, url, name):
+def get_episodes(website, url, name, german=False, otrNameFormat=None):
     if website == 'IM':
-        return imdb_episodes(url, name)
+        episodes = imdb_episodes(url, name)
     elif website == 'SJ':
-        return serienjunkie_episodes(url, name)
+        episodes = serienjunkie_episodes(url, name, german)
     else:
         raise ValueError(f'Invalid website for episode lists: {website}')
+    for e in episodes:
+        episode = e['episode']
+        season = e['season']
+        title = e['title']
+        e['destName'] = settings.SERIES_NAME_FORMAT.format(
+            **e,
+            extension=settings.DEST_EXT
+          ) if episode >= 0 and season >=0 else None
+        e['search'] = otrNameFormat.format(
+            **e,
+            name=toOTRName(name),
+        ) if otrNameFormat else f"{name} {title}"
+    return episodes
 
 def imdb_episodes(imdb_url, name):
     r = requests.get(imdb_url)
@@ -39,9 +55,6 @@ def imdb_episodes(imdb_url, name):
             'url': url,
             'season': season,
             'episode': episode,
-            'destName': settings.SERIES_NAME_FORMAT.format(
-              name=name, season=season, episode=episode, title=title, extension=settings.DEST_EXT
-            ) if episode >= 0 and season >=0 else None,
           })
         else:
             print("Found no info for %s" % item)
@@ -49,28 +62,81 @@ def imdb_episodes(imdb_url, name):
     return episodes
 
 # https://www.serienjunkies.de/lethal-weapon/alle-serien-staffeln.html
-def serienjunkie_episodes(url, name):
+def serienjunkie_episodes(url, name, german=True):
     r = requests.get(url)
     b = BeautifulSoup(r.text, 'html.parser')
-    tables = b.find_all("table", attrs={'class': 'eplist'})
-    if len(tables) == 0:
+    table = b.find("table", attrs={'class': 'eplist'})
+    if not table:
        raise LookupError(f"Couldn't find episode list of serienjunkies.de at {url}")
     episodes = []
-    for row in t.find_all('tr'):
-        cols = row.find_all('td', attrs={'class': 'e0'})
+    for row in table.find_all('tr'):
+        cols = row.find_all('td', attrs={'class': ['e0', 'e1']})
         if len(cols) >= 4:
-            title_link = cols[2].find_all('a', attrs={'itemprop', 'url'})[0]
-            title_span = title_link.find_all('span', attrs={'itemprop', 'name'})
             season_str = cols[0].get_text()
             season = episode = -1
             m = re.match('([0-9]+)x([0-9]+)', season_str)
             if m:
                 season = int(m.group(1))
                 episode = int(m.group(2))
+            else:
+                raise LookupError(f"Couldn't match number of episode and season in {season_str}!")
+
+            name = title_link = None
+            if german:
+                col = cols[3]
+                title_link = col.find('a')
+                if not title_link:
+                    raise LookupError(f"Couldn't find title link on serienjunkies.de in {col}")
+                name = title_link.get_text()
+            else:
+                col = cols[2]
+                title_link = col.find('a', attrs={'itemprop': 'url'})
+                if not title_link:
+                    raise LookupError(f"Couldn't find title link on serienjunkies.de in {col}")
+                title_span = col.find('span', attrs={'itemprop': 'name'})
+                if not title_span:
+                    raise LookupError(f"Couldn't find title span on serienjunkies.de int {col}")
+                name = title_span.get_text()
+            url = title_link.attrs['href']
+
+            date_col = row.find('td', attrs={'class': 'ar'})
+            date = None
+            if date_col:
+                date_str = date_col.get_text()
+                if date_str:
+                    date = datetime.strptime(date_str, "%d.%m.%Y")
+
             episodes.append({
-              'title': title_span.get_text(),
-              'url': title_link.attrs['href'],
+              'title': name,
+              'url': url,
               'season': season,
               'episode': episode,
+              'date': date,
             });
+    # Ugly workaround for wrong numbering in case of double episodes (two in one)
+    print(f"Length: {len(episodes)}")
+    i = 0
+    while i < len(episodes) - 1:
+        e = episodes[i]
+        next = episodes[i + 1]
+        if e['season'] == next['season'] and e['date'] == next['date']:
+            firstTitle = e['title']
+            nextTitle = next['title']
+            match = SequenceMatcher(None, firstTitle, nextTitle).find_longest_match(
+                0,
+                len(firstTitle),
+                0,
+                len(nextTitle))
+            # Both titles start with the same string
+            if match and match.a == 0 and match.b == 0:
+                e['title'] = firstTitle[:match.size]
+
+            episodes.remove(next)
+            for j in range(i + 1, len(episodes)):
+                e2 = episodes[j]
+                if e2['season'] == e['season']:
+                    e2['episode'] -= 1
+                else:
+                    break
+        i += 1
     return episodes

@@ -168,7 +168,7 @@ CUT_DIR = os.path.join(WWW_DIR, 'temp')
 # Saving video files
 DEST_DIR = os.path.join(WWW_DIR, 'videos')
 DEST_EXT = "avi"
-SERIES_NAME_FORMAT = '{name} s{season:02}e{episode:02} - {title}.{extension}'
+SERIES_NAME_FORMAT = '{title} s{season:02}e{episode:02} - {title}.{extension}'
 MEDIA_URL = '/media/'
 
 # Logging

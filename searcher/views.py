@@ -74,15 +74,17 @@ class SeriesView(BaseView):
         url = form.cleaned_data.get("url")
         website = form.cleaned_data.get('website')
         series = form.cleaned_data.get("series")
+        german = form.cleaned_data.get("german")
+        otrNameFormat = form.cleaned_data.get("otrNameFormat")
 
         # titles = getTitles(search=q, page_start=0, page_num=50, min_dur=40)
         # grouped = group_titles(titles)
-        episodes = get_episodes(website, url, series)
+        episodes = get_episodes(website=website, url=url, name=series, german=german, otrNameFormat=otrNameFormat)
         refreshKeys()
         for e in episodes:
             title = toOTRName(e['title'])
             query = toOTRName(series)
-            results = getTitles(search=f"{query} {title}", page_start=0, page_num=1, min_dur=40)
+            results = getTitles(search=e['search'], page_start=0, page_num=1, min_dur=40)
             e['otr'] = results
             e['decoded'] = any(r for r in results if r['isDecoded'])
             cur_url = e['url']

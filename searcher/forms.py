@@ -35,17 +35,20 @@ class SimpleSearchForm(MovieIndexForm):
 class SeriesIndexForm(forms.ModelForm):
     class Meta:
         model = Series
-        fields = ['url', 'website', 'series']
+        fields = ['url', 'website', 'series', 'german', 'otrNameFormat']
         labels = {
             'url': "URL to episode list",
             'website': "Website",
             'series': "Name of the series",
+            'german': "Use German titles? (only for serienjunkies.de)",
+            'otrNameFormat': "Custom Format to search for files",
         }
         widgets = {
             'website': forms.Select(choices=(
-            ('IM', 'IMDB'),
-            ('SJ', 'Serienjunkies'),
-            ))
+              ('IM', 'IMDB'),
+              ('SJ', 'Serienjunkies'),
+              )),
+            'otrNameFormat': forms.TextInput(attrs={'placeholder': "{name} {name} S{season:02d}E{episode:02d} {title}"})
         }
 
     @property
