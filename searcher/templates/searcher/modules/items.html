@@ -75,7 +75,7 @@
 </tr>
 {% if forloop.first and items|length > 1 %}
 <tr id="more-{{ num }}">
-  <td><a class="btn btn-primary" data-toggle="collapse" data-target=".collapse-{{ num }}" role="button" aria-expanded="false" aria-controls="collapse-{{ num }}">More..</a></td>
+  <td><a class="btn btn-primary" data-toggle="collapse" data-target=".collapse-{{ num }}" role="button" aria-expanded="false" aria-controls="collapse-{{ num }}"> ({{ items|length|add:"-1" }}) More..</a></td>
 </tr>
 {% endif %}
 {% endfor %}

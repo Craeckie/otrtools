@@ -19,6 +19,7 @@ def get_episodes(website, url, name, german=False, otrNameFormat=None):
         title = e['title']
         e['destName'] = settings.SERIES_NAME_FORMAT.format(
             **e,
+            series=name,
             extension=settings.DEST_EXT
           ) if episode >= 0 and season >=0 else None
         e['search'] = otrNameFormat.format(
