@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^series/', views.SeriesView.as_view(), name='series'),
     path('cutlist/<str:file>/', views.cutlist, name='cutlist'),
     path('cutlist_test/', views.cutlist_test, name='cutlist-test'),
+    path('clearCache/', views.clearCache, name='clear-cache'),
     path('', RedirectView.as_view(pattern_name=f'{app_name}:movies', permanent=False), name='main'),
 ]

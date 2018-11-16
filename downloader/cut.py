@@ -48,6 +48,7 @@ def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=Fal
         print(f"Cutting failed!")
         traceback.print_exc()
 
+    destPath = None
     if cut_files:
         if len(cut_files) == 0: # No cut in cutlist
           print("Error: No cuts found in cutlist!")

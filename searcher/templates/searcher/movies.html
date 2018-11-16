@@ -29,6 +29,7 @@
               </div>
             </div>
             <button type="submit" class="btn btn-success">Search</button>
+            <button type="button" id="clearCacheBtn" class="btn btn-warning" onclick="javascript:clearCache();">Clear cache</button>
         </form>
       </div>
     </div>
@@ -52,5 +53,15 @@
     </div>
   </div>
 </body>
+
+<script type="text/javascript">
+function clearCache() {
+  $.getJSON('{% url 'searcher:clear-cache' %}', function(data) {
+    if (data.success == true) {
+      $('#clearCacheBtn').attr({'class': 'btn btn-info'}).html("Cleared").prop('disabled', true);
+    }
+  });
+}
+</script>
 </html>
 {% endblock %}

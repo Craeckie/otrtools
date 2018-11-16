@@ -182,10 +182,11 @@ def getTitles(
         if page_list: # has any pages?
             last_page_li = b.find('li', { 'class': 'last'})
             last_page_num = int(last_page_li.a.attrs['data-page']) + 1 # data-page is zero-based..
-            print(f"Last page: {last_page_num}")
+            # print(f"Last page: {last_page_num}")
             first_page = min((page_start - 1)*page_num + 2, last_page_num)
-            last_page = min((page_start + 1) * page_num + 1, last_page_num + 1)
-            print(f"Page range: {first_page} -> {last_page}")
+            # print(f"last_page: {page_start} * {page_num} + 1")
+            last_page = min(page_start * page_num + 1, last_page_num + 1)
+            # print(f"Page range: {first_page} -> {last_page}")
             pages = range(first_page, last_page)
             with Pool(4) as p:
               titles.extend(chain.from_iterable(p.starmap(getTitles, zip(

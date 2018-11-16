@@ -165,3 +165,8 @@ def cutlist(request, file):
     # print(items)
     # return JsonResponse(resp.json())
     return JsonResponse({'items': items})
+
+def clearCache(request):
+    getTitles.cache_clear()
+    refreshKeys()
+    return JsonResponse({'success': True})
