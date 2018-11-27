@@ -7,8 +7,9 @@ from . import views
 app_name = 'searcher'
 
 urlpatterns = [
-    url(r'^movies/', views.MovieView.as_view(), name='movies'),
-    url(r'^series/', views.SeriesView.as_view(), name='series'),
+    path('movies/', views.MovieView.as_view(), name='movies'),
+    path('series/', views.SeriesView.as_view(), name='series'),
+    path('series/<series>/<int:season>/', views.SeriesView.as_view(), name='series'),
     path('cutlist/<str:file>/', views.cutlist, name='cutlist'),
     path('cutlist_test/', views.cutlist_test, name='cutlist-test'),
     path('clearCache/', views.clearCache, name='clear-cache'),

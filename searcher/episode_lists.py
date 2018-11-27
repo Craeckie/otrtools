@@ -6,29 +6,32 @@ from .otrkeyfinder import toOTRName
 from datetime import datetime
 from difflib import SequenceMatcher
 
-def get_episodes(website, url, name, german=False, otrNameFormat=None):
+def get_episodes(website, url, series, german=False, otrNameFormat=None):
     if website == 'IM':
-        episodes = imdb_episodes(url, name)
+        episodes = imdb_episodes(url, series)
     elif website == 'SJ':
-        episodes = serienjunkie_episodes(url, name, german)
+        episodes = serienjunkie_episodes(url, series, german)
     else:
         raise ValueError(f'Invalid website for episode lists: {website}')
     for e in episodes:
         episode = e['episode']
         season = e['season']
         title = e['title']
-        e['destName'] = settings.SERIES_NAME_FORMAT.format(
-            **e,
-            series=name,
-            extension=settings.DEST_EXT
-          ) if episode >= 0 and season >=0 else None
-        e['search'] = otrNameFormat.format(
-            **e,
-            name=toOTRName(name),
-        ) if otrNameFormat else f"{name} {title}"
+        e.update({
+          'series': series,
+          'title': title,
+          'OTRseries': toOTRName(series),
+          'OTRtitle': toOTRName(title),
+          'extension': settings.DEST_EXT,
+        })
+        format = settings.SERIES_NAME_FORMAT
+        e['destName'] = format.format(**e) \
+            if episode >= 0 and season >=0 else None
+        e['search'] = otrNameFormat.format(**e) \
+            if otrNameFormat else "{OTRseries} {OTRtitle}".format(**e)
     return episodes
 
-def imdb_episodes(imdb_url, name):
+def imdb_episodes(imdb_url, series):
     r = requests.get(imdb_url)
     b = BeautifulSoup(r.text, 'html.parser')
     l = b.find_all("div", attrs={'class': 'list_item'})
@@ -63,7 +66,7 @@ def imdb_episodes(imdb_url, name):
     return episodes
 
 # https://www.serienjunkies.de/lethal-weapon/alle-serien-staffeln.html
-def serienjunkie_episodes(url, name, german=True):
+def serienjunkie_episodes(url, series, german=True):
     r = requests.get(url)
     b = BeautifulSoup(r.text, 'html.parser')
     table = b.find("table", attrs={'class': 'eplist'})
@@ -82,13 +85,13 @@ def serienjunkie_episodes(url, name, german=True):
             else:
                 raise LookupError(f"Couldn't match number of episode and season in {season_str}!")
 
-            name = title_link = None
+            title = title_link = None
             if german:
                 col = cols[3]
                 title_link = col.find('a')
                 if not title_link:
                     raise LookupError(f"Couldn't find title link on serienjunkies.de in {col}")
-                name = title_link.get_text()
+                title = title_link.get_text()
             else:
                 col = cols[2]
                 title_link = col.find('a', attrs={'itemprop': 'url'})
@@ -97,7 +100,7 @@ def serienjunkie_episodes(url, name, german=True):
                 title_span = col.find('span', attrs={'itemprop': 'name'})
                 if not title_span:
                     raise LookupError(f"Couldn't find title span on serienjunkies.de int {col}")
-                name = title_span.get_text()
+                title = title_span.get_text()
             url = title_link.attrs['href']
 
             date_col = row.find('td', attrs={'class': 'ar'})
@@ -108,7 +111,7 @@ def serienjunkie_episodes(url, name, german=True):
                     date = datetime.strptime(date_str, "%d.%m.%Y")
 
             episodes.append({
-              'title': name,
+              'title': title,
               'url': url,
               'season': season,
               'episode': episode,

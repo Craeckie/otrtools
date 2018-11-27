@@ -48,14 +48,15 @@ def refreshKeys():
     loadKeys.cache_clear()
 
 def toOTRName(name):
-    return name \
+    name = name \
       .replace(' ', '_') \
       .replace('-', ' ') \
       .replace(':', ' ') \
       .replace('.', '_') \
-      .replace('\'', ' ') \
-      .replace(',', ' ') \
-      .replace('?', '')
+      .replace('\'s', '_s') \
+      .replace(',', ' ')
+
+    return re.sub('[^a-zA-Z0-9 _-]+', '', name)
 
 def parseOtrkeys(otrkey_divs):
     files = []

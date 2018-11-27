@@ -32,14 +32,15 @@ class SimpleSearchForm(MovieIndexForm):
         self.fields['min_duration'].widget = forms.HiddenInput()
         self.fields['start_page'].widget = forms.HiddenInput()
 
-class SeriesIndexForm(forms.ModelForm):
+class SeriesAddForm(forms.ModelForm):
     class Meta:
         model = Series
-        fields = ['url', 'website', 'series', 'german', 'otrNameFormat']
+        fields = ['url', 'website', 'series', 'numEpisodes', 'german', 'otrNameFormat']
         labels = {
             'url': "URL to episode list",
             'website': "Website",
             'series': "Name of the series",
+            'numEpisodes': "Number of episodes",
             'german': "Use German titles? (only for serienjunkies.de)",
             'otrNameFormat': "Custom Format to search for files",
         }
@@ -48,12 +49,12 @@ class SeriesIndexForm(forms.ModelForm):
               ('IM', 'IMDB'),
               ('SJ', 'Serienjunkies'),
               )),
-            'otrNameFormat': forms.TextInput(attrs={'placeholder': "{name} {name} S{season:02d}E{episode:02d} {title}"})
+            'otrNameFormat': forms.TextInput(attrs={'placeholder': "{OTRserise} S{season:02d}E{episode:02d} {OTRtitle}"})
         }
 
     @property
     def helper(self):
         helper = FormHelper()
         helper.form_method = 'post'
-        helper.add_input(Submit('submit', 'Search'))
+        helper.add_input(Submit('submit', 'Add'))
         return helper

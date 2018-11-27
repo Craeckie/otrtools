@@ -1,5 +1,5 @@
 # coding: utf-8
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from django.views.generic.edit import CreateView
 import urllib.parse, requests
@@ -7,10 +7,13 @@ from itertools import groupby
 from datetime import timedelta
 from operator import itemgetter, attrgetter
 
+from multiprocessing.dummy import Pool
+from itertools import chain, repeat
+
 from otrtools.views import BaseView
 from .otrkeyfinder import Title, getTitles, refreshKeys, toOTRName
 from .episode_lists import get_episodes
-from .forms import MovieIndexForm, SeriesIndexForm
+from .forms import MovieIndexForm, SeriesAddForm
 from .models import Series
 
 sortkeyfn = lambda t:t['title']
@@ -62,46 +65,59 @@ class MovieView(BaseView):
     #
     # else:
     #     form = MovieIndexForm()
-class AddSeriesView(CreateView):
-    model = Series
-    form_class = SeriesIndexForm
-
 
 class SeriesView(BaseView):
     template_name = 'searcher/series.html'
-    form_class = SeriesIndexForm #MovieIndexForm
+    form_class = SeriesAddForm
+
+    def getEpisodeTitles(self, url, series, episode):
+        # title = toOTRName(episode['title'])
+        # query = toOTRName(series)
+        results = getTitles(search=episode['search'], page_start=0, page_num=1, min_dur=40)
+        episode['otr'] = results
+        episode['decoded'] = any(r for r in results if r['isDecoded'])
+        episode['url'] = urllib.parse.urljoin(url, episode['url'])
+        return episode
+
     def form_valid(self, form, **kwargs):
         url = form.cleaned_data.get("url")
         website = form.cleaned_data.get('website')
         series = form.cleaned_data.get("series")
         german = form.cleaned_data.get("german")
         otrNameFormat = form.cleaned_data.get("otrNameFormat")
+        form.save()
 
-        # titles = getTitles(search=q, page_start=0, page_num=50, min_dur=40)
-        # grouped = group_titles(titles)
-        episodes = get_episodes(website=website, url=url, name=series, german=german, otrNameFormat=otrNameFormat)
-        refreshKeys()
-        for e in episodes:
-            title = toOTRName(e['title'])
-            query = toOTRName(series)
-            results = getTitles(search=e['search'], page_start=0, page_num=1, min_dur=40)
-            e['otr'] = results
-            e['decoded'] = any(r for r in results if r['isDecoded'])
-            cur_url = e['url']
-            e['url'] = urllib.parse.urljoin(url, cur_url)
-
-            # for group in grouped:
-            #     if title.lower() in group.title.lower():
-            #         e['otr'] = group
-            #         break
         ctx = self.get_context_data(**kwargs)
         ctx.update({
-            'episodes': episodes,
             'form': form
         })
         return render(self.request, 'searcher/series.html', ctx)
-    # else:
-    #     form = SeriesIndexForm()
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['serieslist'] = Series.objects.all()
+
+        if 'series' in self.kwargs:
+            series = get_object_or_404(Series, pk=self.kwargs['series'])
+
+            url = series.url
+            # website = form.cleaned_data.get('website')
+            # series = form.cleaned_data.get("series")
+            # german = form.cleaned_data.get("german")
+            # otrNameFormat = form.cleaned_data.get("otrNameFormat")
+
+            episodelist = get_episodes(website=series.website, url=series.url, series=series.series, german=series.german, otrNameFormat=series.otrNameFormat)
+            refreshKeys()
+            episodes = []
+            with Pool(4) as p:
+              episodes = list(p.starmap(self.getEpisodeTitles, zip(
+                  repeat(url),
+                  repeat(series),
+                  episodelist
+              )))
+            ctx['episodes'] = episodes
+
+        return ctx
 
 def cutlist_test(request):
     return render(request, 'searcher/cutlists.html', {})

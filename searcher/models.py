@@ -11,3 +11,4 @@ class Series(models.Model):
     series = models.CharField(max_length=200)
     german = models.BooleanField()
     otrNameFormat = models.CharField(max_length=200, blank=True)
+    numEpisodes = models.IntegerField(default=1)
