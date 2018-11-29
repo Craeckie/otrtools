@@ -35,12 +35,12 @@ class SimpleSearchForm(MovieIndexForm):
 class SeriesAddForm(forms.ModelForm):
     class Meta:
         model = Series
-        fields = ['url', 'website', 'series', 'numEpisodes', 'german', 'otrNameFormat']
+        fields = ['url', 'website', 'series', 'numSeasons', 'german', 'otrNameFormat']
         labels = {
             'url': "URL to episode list",
             'website': "Website",
             'series': "Name of the series",
-            'numEpisodes': "Number of episodes",
+            'numSeasons': "Number of seasons",
             'german': "Use German titles? (only for serienjunkies.de)",
             'otrNameFormat': "Custom Format to search for files",
         }

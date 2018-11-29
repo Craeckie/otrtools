@@ -1,6 +1,7 @@
 {% extends 'searcher/base.html' %}
 
 {% load crispy_forms_tags %}
+{% load admin_urls %}
 
 {% block header %}
   {% include 'searcher/modules/header.html' with title="Series" %}
@@ -19,14 +20,15 @@
         <h3>Select a series</h3>
         <table class="table">
           <tbody>
-          {% for s in serieslist %}
+          {% for s, meta in serieslist %}
           <tr>
-            <td><a href="{% url 'searcher:series' series=s season=1 %}">{{s.series}}</td>
+            <td><a href="{% url meta|admin_urlname:'change' s.pk %}">{{s.series}}</td>
             <td><select name="">
               <option value="0">Select Episode</option>
-              <option value="-1" onclick="location.href='http://127.0.0.1:8000/search/series/1/1';">All</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
+              <option value="-1" onclick="location.href='{% url 'searcher:series' series=s.pk season=0 %}';">All</option>
+              {% for i in s.get_season_range %}
+              <option value="{{ e }}" onclick="location.href='{% url 'searcher:series' series=s.pk season=i %}';">{{ i }}</option>
+              {% endfor %}
             </select></td>
           </tr>
           {% empty %}

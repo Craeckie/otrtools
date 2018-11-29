@@ -12,7 +12,7 @@ from itertools import chain, repeat
 
 from otrtools.views import BaseView
 from .otrkeyfinder import Title, getTitles, refreshKeys, toOTRName
-from .episode_lists import get_episodes
+from .episode_lists import get_episode_list
 from .forms import MovieIndexForm, SeriesAddForm
 from .models import Series
 
@@ -86,6 +86,7 @@ class SeriesView(BaseView):
         german = form.cleaned_data.get("german")
         otrNameFormat = form.cleaned_data.get("otrNameFormat")
         form.save()
+        form.clean()
 
         ctx = self.get_context_data(**kwargs)
         ctx.update({
@@ -93,28 +94,38 @@ class SeriesView(BaseView):
         })
         return render(self.request, 'searcher/series.html', ctx)
 
+    def get_season_episodes(self, series, season):
+        url = series.url.format(season=season)
+        episodelist = get_episode_list(website=series.website, url=url, series=series.series, german=series.german, otrNameFormat=series.otrNameFormat)
+        refreshKeys()
+        episodes = []
+        with Pool(4) as p:
+          episodes = list(p.starmap(self.getEpisodeTitles, zip(
+              repeat(url),
+              repeat(series),
+              episodelist
+          )))
+        return episodes
+
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx['serieslist'] = Series.objects.all()
+        ctx['serieslist'] = []
+        for s in Series.objects.all():
+          ctx['serieslist'].append((s, s._meta))
 
-        if 'series' in self.kwargs:
+        if all(x in self.kwargs for x in ['series', 'season']):
             series = get_object_or_404(Series, pk=self.kwargs['series'])
+            season = self.kwargs['season']
 
-            url = series.url
-            # website = form.cleaned_data.get('website')
-            # series = form.cleaned_data.get("series")
-            # german = form.cleaned_data.get("german")
-            # otrNameFormat = form.cleaned_data.get("otrNameFormat")
+            if season <= 0:
+                episodes = []
+                for i in series.get_season_range():
+                  episodes.extend(self.get_season_episodes(series, i))
+            else:
+                episodes = self.get_season_episodes(series, season)
 
-            episodelist = get_episodes(website=series.website, url=series.url, series=series.series, german=series.german, otrNameFormat=series.otrNameFormat)
-            refreshKeys()
-            episodes = []
-            with Pool(4) as p:
-              episodes = list(p.starmap(self.getEpisodeTitles, zip(
-                  repeat(url),
-                  repeat(series),
-                  episodelist
-              )))
+
+
             ctx['episodes'] = episodes
 
         return ctx

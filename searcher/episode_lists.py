@@ -6,7 +6,7 @@ from .otrkeyfinder import toOTRName
 from datetime import datetime
 from difflib import SequenceMatcher
 
-def get_episodes(website, url, series, german=False, otrNameFormat=None):
+def get_episode_list(website, url, series, german=False, otrNameFormat=None):
     if website == 'IM':
         episodes = imdb_episodes(url, series)
     elif website == 'SJ':
