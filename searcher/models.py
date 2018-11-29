@@ -14,7 +14,10 @@ class Series(models.Model):
     numSeasons = models.IntegerField(default=1)
 
     def get_season_range(self):
-        return range(1, self.numSeasons)
+        return range(1, self.numSeasons + 1)
+
+    def get_url(self, season=1):
+        return self.url.format(season=season)
 
     def __str__(self):
         return self.series

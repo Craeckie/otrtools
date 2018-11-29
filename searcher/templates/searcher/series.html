@@ -2,6 +2,7 @@
 
 {% load crispy_forms_tags %}
 {% load admin_urls %}
+{% load icons %}
 
 {% block header %}
   {% include 'searcher/modules/header.html' with title="Series" %}
@@ -22,7 +23,7 @@
           <tbody>
           {% for s, meta in serieslist %}
           <tr>
-            <td><a href="{% url meta|admin_urlname:'change' s.pk %}">{{s.series}}</td>
+            <td><a target="_blank" href="{{ s.get_url }}">{{s.series}}</a></td>
             <td><select name="">
               <option value="0">Select Episode</option>
               <option value="-1" onclick="location.href='{% url 'searcher:series' series=s.pk season=0 %}';">All</option>
@@ -30,6 +31,11 @@
               <option value="{{ e }}" onclick="location.href='{% url 'searcher:series' series=s.pk season=i %}';">{{ i }}</option>
               {% endfor %}
             </select></td>
+            <td><a
+              class="btn btn-success btn-sm" type="button"
+              href="{% url meta|admin_urlname:'change' s.pk %}"
+              data-toggle="tooltip" data-placement="top" title="Edit"
+              >{% icon 'edit' %}</td>
           </tr>
           {% empty %}
           <tr>

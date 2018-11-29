@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'downloader',
     'searcher',
     'crispy_forms',
+    'django_icons',
 ]
 
 MIDDLEWARE = [
