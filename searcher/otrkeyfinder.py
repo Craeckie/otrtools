@@ -50,11 +50,11 @@ def refreshKeys():
 def toOTRName(name):
     name = name \
       .replace(' ', '_') \
-      .replace('-', ' ') \
       .replace(':', ' ') \
       .replace('.', '_') \
       .replace('\'s', '_s') \
       .replace(',', ' ')
+      # .replace('-', ' ') \
 
     return re.sub('[^a-zA-Z0-9 _-]+', '', name)
 
