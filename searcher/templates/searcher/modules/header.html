@@ -37,3 +37,40 @@ body > .container {
 }
 
 </style>
+
+<script type="text/javascript">
+  function loadCutlists(file_url, destName, video_url, mirror_name, table_id) {
+    $(table_id).html("<tr><td>Loading..</td></tr>");
+    $.getJSON(file_url, function(data) {
+      items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
+      //console.log(data.items)
+      found_cutlists = false;
+      $.each(data.items, function (key, item) {
+        cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
+        row = '<tr>';
+        row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
+        row += '<td>' + item.hits + '</td>';
+        row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
+        row += '<td><a target="_blank" href="{% url 'downloader:add' %}'
+          + '?video=' + video_url
+          + '&cutlist='  + cutlist_url
+          + '&dest='  + destName
+          + '" title="Uses ' + mirror_name + '">To Downloader</a></td>';
+        row += '</tr>';
+        items.push(row);
+        found_cutlists = true;
+      });
+      //console.log(items);
+      // for (var item in data) {
+      //   if (data.hasOwnProperty(item)) {
+      //
+      //   }
+      // }
+      if (found_cutlists === true) {
+          $(table_id).html(items.join(""));
+      } else {
+          $(table_id).html('<tr><td>No cutlist found. <a target="_blank" href="{% url 'downloader:add' %}?video=' + video_url + '">Download without cutting?</a></td></tr>');
+      }
+    });
+  }
+</script>
