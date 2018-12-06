@@ -5,8 +5,6 @@ from urllib.parse import urlparse
 import requests
 from django.conf import settings
 
-url="https://otr.datenkeller.net/?getFile=The_100__Praimfaya_17.05.24_21-00_uswpix_60_TVOON_DE.mpg.HD.avi.otrkey"
-
 session = requests.session()
 
 def _datenkeller(url, otrkey=None):
@@ -81,7 +79,7 @@ def get_dl_url(url, otrkey=None):
         return _simpleOTR(new_url, otrkey)
     else:
         if urlparse(url).hostname == 'otrkeyfinder.com':
-            raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}!")
+            raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}! (URL: {new_url})")
         else:
             return (new_url, otrkey)
 
