@@ -60,7 +60,7 @@
                 {% if titles %}
                     {% include "searcher/modules/items.html" with items=titles num=forloop.counter destName=e.destName %}
                 {% else %}
-                  <tr><td>No files found for this episode. <a target="_blank" href="https://otrkeyfinder.com/en/?search={{ e.search }}&order=date-name">Search manually</a>.</td></tr>
+                  <tr><td>No files found for this episode. <a target="_blank" href="https://otrkeyfinder.com/en/?search={{ e.search }}&order=date-name">Search</a> and <a target="_blank" href="{% url 'downloader:add' %}?dest={{ e.destName }}">add</a> manually.</td></tr>
                 {% endif %}
                 </table>
               </td>
