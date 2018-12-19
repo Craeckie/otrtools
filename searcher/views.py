@@ -26,9 +26,7 @@ def group_titles(titles):
         values = list(values)
         for i in range(0, len(values)):
             values[i]['num'] = i
-        isSimilarDecoded = any(x['isSimilarDecoded'] for x in values)
-        if 'Ziemlich' in k:
-          print(isSimilarDecoded)
+        isSimilarDecoded = any(x['isSimilarDecoded'] or x['isDecoded'] for x in values)
         seconds = [x['length'].seconds for x in values]
         item_count = len(seconds)
         time = timedelta(seconds=sum(seconds) / item_count)
@@ -55,7 +53,9 @@ class MovieView(BaseView):
             min_dur=min_duration)
         grouped = group_titles(titles)
         ctx = super().get_context_data(**kwargs)
-        ctx['titles'] = grouped
+        ctx['new_titles'] = list(filter(lambda t: not t.isSimilarDecoded, grouped))
+        ctx['old_titles'] = list(filter(lambda t: t.isSimilarDecoded, grouped))
+
         return render(self.request, 'searcher/movies.html', ctx)
     # def request()
     # grouped = []

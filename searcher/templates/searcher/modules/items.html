@@ -20,12 +20,12 @@
   </td>
   <td>
     <table class="table" id="cutlist-table-{{ num }}-{{ forloop.counter }}">
-      {% if item.isDecoded %}
+      {% if item.isDecoded or hide_cutlists %}
         <tr><td>Already decoded. <a href="javascript:{% cutlist_call item forloop.counter num destName True %}">Load cutlists anyway?</a></td></tr>
       {% endif %}
     </table>
     <script>
-      {% if item.file_decrypted and forloop.first and not item.isDecoded %}
+      {% if item.file_decrypted and forloop.first and not item.isDecoded and not hide_cutlists %}
         {% cutlist_call item forloop.counter num destName %};
       {% elif not forloop.first %}
         $('.collapse-{{ num }}:first').on('show.bs.collapse', function() {
