@@ -120,11 +120,13 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False):
         print("Not cutting!")
         # If audio file passed, merge it with video
         if audio:
-          dest = merge(video, audio, video_base)
+          dest = merge(video.get_decrypted(dest_path), audio.get_decrypted(dest_path), video_base)
           if not dest:
               return False
           else:
               video = dest
+        else:
+            video = video.get_decrypted(dest_path)
         if not destName:
             destName = get_real_name(video, settings.DEST_EXT, isUncut=True)
         destPath = os.path.abspath(os.path.join(settings.DEST_DIR, destName))

@@ -43,6 +43,7 @@ def add_download_list(listfile, url, dest_path, filename):
 def download(listfile, video, dest_path, audio=None):
     dl_parts = 4
     if any('otr-files.de/' in url for url in [video.url, audio.url if audio else None] if url):
+        print("Only using one download part!")
         dl_parts = 1
     args = [
       'aria2c',
