@@ -13,8 +13,8 @@ format2codec = {
 }
 ffmpeg_general_options = [
   '-hide_banner',
-  '-loglevel', 'warning',
-  '-stats'
+  # '-loglevel', 'warning',
+  # '-stats'
 ]
 
 def get_codec(video):
