@@ -40,9 +40,9 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
     video_name = f"cut{cut_params['index']}.{ext}"
     video_path = os.path.join(video_base, video_name)
 
-    extra_flags = []
-    if video.endswith(".avi"):
-        extra_flags += ["-fflags", "+genpts"]
+    # extra_flags = []
+    # if video.endswith(".avi"):
+    #     extra_flags += ["-fflags", "+genpts"]
     args = [encoder]
     args += ffmpeg_general_options
     #   args += ['-noaccurate_seek']
@@ -66,6 +66,7 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
     print("Arguments: %s" % str(args))
     ret = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(ret.stdout.decode('utf-8'))
+    print(ret.stderr.decode('utf-8'))
     if ret.returncode != 0:
         print(f"Running ffmpeg failed! Returncode {ret.returncode}")
         return None
