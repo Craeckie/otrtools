@@ -47,12 +47,14 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
     args += ffmpeg_general_options
     #   args += ['-noaccurate_seek']
     # if not transcode:
-    args += ['-ss', str(start)]
+    if not transcode:
+        args += ['-ss', str(start)]
 
     args += ['-fflags', '+genpts', '-i', video]
     if transcode:
         args += get_codec(video) + ['-crf', '18', '-preset', 'slower', '-tune', 'film']
-        args += ['-ss', '0']
+        #args += ['-ss', '0']
+        args += ['-ss', str(start)]
     else:
         args += ['-c:v', 'copy']
     if meta_comment:
