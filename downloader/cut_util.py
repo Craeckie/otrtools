@@ -67,7 +67,7 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
     ret = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(ret.stdout)
     if ret.returncode != 0:
-        print("Running ffmpeg failed!")
+        print(f"Running ffmpeg failed! Returncode {ret.returncode}")
         return None
     concat_file.write(f"file '{video_name}'\n")
     return video_path
