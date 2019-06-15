@@ -47,14 +47,13 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
     args += ffmpeg_general_options
     #   args += ['-noaccurate_seek']
     # if not transcode:
-    if not transcode:
-        args += ['-ss', str(start)]
+    args += ['-ss', str(start)]
 
     args += ['-fflags', '+genpts', '-i', video]
     if transcode:
         args += get_codec(video) + ['-crf', '18', '-preset', 'slower', '-tune', 'film']
-        #args += ['-ss', '0']
-        args += ['-ss', str(start)]
+        args += ['-ss', '0']
+        # args += ['-ss', str(start)]
     else:
         args += ['-c:v', 'copy']
     if meta_comment:
@@ -65,7 +64,7 @@ def cut(encoder, video, video_base, concat_file, cut_params, transcode=False, me
              '-map', '0',
              '-avoid_negative_ts', '1',
              '-y', video_path]
-    print("Arguments: %s" % str(args))
+    # print("Arguments: %s" % str(args))
     ret = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     print(ret.stdout.decode('utf-8'))
     # print(ret.stderr.decode('utf-8'))
