@@ -32,6 +32,8 @@ def _datenkeller(url, otrkey=None):
         return (dl_url, otrkey)
       else:
         match = re.search("<tr bgcolor=lightgrey><td>Deine Position in der Warteschlange: </td><td>([^<]+)</td></tr>", content)
+        if otrkey:
+            print(otrkey[:25] + '..: ', end='')
         if match:
             print("Waiting in Queue position %s.." % match.group(1), flush=True)
             time.sleep(settings.DATENKELLER_QUEUE_REFRESH)
@@ -55,6 +57,8 @@ def _simpleOTR(url, otrkey=None):
     content = session.get(url).text
     match = re.search("<font face=Verdana >wanted file: <a href='(?P<url>[^']+)'", content)
     if match:
+        if otrkey:
+            print(otrkey[:25] + '..: ', end='')
         print("Got the link!", flush=True)
         dl_url = match.group("url")
         print("Url: " + dl_url, flush=True)
