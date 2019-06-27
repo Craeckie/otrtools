@@ -46,8 +46,8 @@ def _datenkeller(url, otrkey=None):
             else:
               print("Warning: Unknown state!", flush=True)
               invalid_state_count += 1
-            time.sleep(5)
-        if invalid_state_count >= 5:
+            time.sleep(settings.DATENKELLER_INVALID_STATE_WAIT)
+        if invalid_state_count >= 30:
             print(content)
             raise RuntimeError(f"Error occurred when waiting in Queue of OTR for {otrkey} at URL {url}!")
 
