@@ -5,6 +5,8 @@ from urllib.parse import urlparse
 import requests
 from django.conf import settings
 
+from downloader import process
+
 session = requests.session()
 
 def _datenkeller(url, otrkey=None):
@@ -47,7 +49,7 @@ def _datenkeller(url, otrkey=None):
               print("Warning: Unknown state!", flush=True)
               invalid_state_count += 1
             time.sleep(settings.DATENKELLER_INVALID_STATE_WAIT)
-        if invalid_state_count >= 30:
+        if invalid_state_count >= settings.DATENKELLER_INVALID_STATE_RETRY:
             print(content)
             raise RuntimeError(f"Error occurred when waiting in Queue of OTR for {otrkey} at URL {url}!")
 
@@ -66,7 +68,7 @@ def _simpleOTR(url, otrkey=None):
     else:
         raise Exception(f"Couldn't parse URL for {otrkey}:\n{content}")
 
-def get_dl_url(url, otrkey=None):
+def get_dl_url(url, otrkey=None, restart_args=None):
     print(f"get_dl_url for {url}")
     if not url:
         return url
@@ -77,15 +79,32 @@ def get_dl_url(url, otrkey=None):
     new_parse_url = urlparse(new_url)
     hostname = new_parse_url.hostname
 
-    if hostname == 'otr.datenkeller.net':
-        return _datenkeller(new_url, otrkey)
-    elif hostname == 'simple-otr-mirror.de':
-        return _simpleOTR(new_url, otrkey)
-    else:
-        if urlparse(url).hostname == 'otrkeyfinder.com':
-            raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}! (URL: {new_url})")
+    try:
+        if hostname == 'otr.datenkeller.net':
+            return _datenkeller(new_url, otrkey)
+        elif hostname == 'simple-otr-mirror.de':
+            return _simpleOTR(new_url, otrkey)
         else:
-            return (new_url, otrkey)
+            if urlparse(url).hostname == 'otrkeyfinder.com':
+                raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}! (URL: {new_url})")
+            else:
+                return (new_url, otrkey)
+    except RuntimeError as e:
+        if restart_args:
+            count = 0
+            if 'tryCount' in restart_args:
+                count = restart_args['tryCount']
+            if count < settings.DATENKELLER_INVALID_STATE_REQUEUE:
+                count += 1
+                print(f"Requeueing {otrkey}, count: {count}!")
+                restart_args['tryCount'] = count
+                process.process.delay(**restart_args)
+            else:
+                print(f"Reached maximum requeues for {otrkey}. Not retrying!")
+                raise e
+        else:
+            print(f"No restart_args found! Can't requeue {otrkey}!")
+            raise e
 
 
 

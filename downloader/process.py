@@ -36,7 +36,14 @@ class MediaInformation:
         return getDecryptedName(otrkey)
 
 @shared_task
-def process(video_url, cutlist, audio_url=None, destName=None, keep=False):
+def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCount=0):
+    restart_args = {
+        'video_url': video_url,
+        'cutlist': cutlist,
+        'audio_url': audio_url,
+        'destName': destName,
+        'keep': keep,
+    }
     if not os.path.exists(temp_path): os.mkdir(temp_path)
     video = MediaInformation(video_url)
 
@@ -79,7 +86,7 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False):
     if destName:
         print(f"Destination:\t{destName}")
 
-    listfile = prepare_download(video, dest_path=dest_path, audio=audio)
+    listfile = prepare_download(video, dest_path=dest_path, audio=audio, restart_args=restart_args)
 
     if listfile:
         if download(listfile, video, dest_path=dest_path, audio=audio) != 0:

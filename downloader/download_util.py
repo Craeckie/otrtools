@@ -4,7 +4,7 @@ from multiprocessing.pool import ThreadPool
 from .cut_util import parse_media_name
 from .waiter import get_dl_url
 
-def prepare_download(video, dest_path, audio=None):
+def prepare_download(video, dest_path, audio=None, restart_args=None):
     listfile = f"{video.get_decrypted(dest_path)}.txt"
     print(f"Preparing download. Listfile: {listfile}")
     if os.path.exists(listfile):
@@ -19,11 +19,11 @@ def prepare_download(video, dest_path, audio=None):
     if os.path.exists(video.get_decrypted(dest_path)):
         print("Video already decrypted")
     else:# not os.path.exists(video.get_otrkey(dest_path)):
-        results.append(pool.apply_async(get_dl_url, (video.url, video.get_otrkey())))
+        results.append(pool.apply_async(get_dl_url, (video.url, video.get_otrkey(), restart_args)))
     if audio and os.path.exists(audio.get_decrypted(dest_path)):
       print("Audio already decrypted")
     elif audio:# and not os.path.exists(audio.get_otrkey(dest_path)):
-        results.append(pool.apply_async(get_dl_url, (audio.url, audio.get_otrkey())))
+        results.append(pool.apply_async(get_dl_url, (audio.url, audio.get_otrkey(), restart_args)))
         # add_download_list(listfile, audio.url, dest_path, audio.get_otrkey())
           # requiresDownload = True
     if not results:

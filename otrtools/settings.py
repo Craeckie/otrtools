@@ -157,6 +157,8 @@ BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhos
 # Downloading
 DATENKELLER_QUEUE_REFRESH = 20
 DATENKELLER_INVALID_STATE_WAIT = 60
+DATENKELLER_INVALID_STATE_RETRY = 10
+DATENKELLER_INVALID_STATE_REQUEUE = 5
 
 # Decryption
 OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
