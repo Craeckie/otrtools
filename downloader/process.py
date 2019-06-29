@@ -3,6 +3,8 @@ from celery import shared_task
 import re, os, shutil, sys
 from argparse import ArgumentParser
 from urllib import parse
+
+from downloader.merge import merge
 from .decrypt import getDecryptedName, decrypt
 from .download_util import prepare_download, download
 from .cut_util import parse_base_name, parse_media_name, get_real_name
