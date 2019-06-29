@@ -42,7 +42,7 @@ def _datenkeller(url, otrkey=None):
         else:
             match = re.search("Ups, da ist was schief gelaufen... Geh nochmal auf die", content)
             if match:
-              print("Something went wrong, restarting queue..")
+              print(f"Something went wrong, restarting queue (count: {invalid_state_count})..")
               session.get(old_url)
               invalid_state_count += 1
             else:
