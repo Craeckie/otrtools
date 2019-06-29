@@ -6,6 +6,7 @@ from otrtools.views import BaseView
 from .process import process
 from .forms import AddForm
 
+
 class AddView(BaseView):
     template_name = 'downloader/add.html'
     form_class = AddForm
@@ -21,7 +22,7 @@ class AddView(BaseView):
         if not process.delay(video, cutlist, audio_url=audio, destName=dest, keep=keep):
             ctx['failed'] = True
 
-        return HttpResponseRedirect(reverse('downloader:add')) #render(self.request, 'downloader/add.html', ctx)
+        return HttpResponseRedirect(reverse('downloader:add'))  # render(self.request, 'downloader/add.html', ctx)
 
     def get_initial(self):
         initial = super().get_initial()

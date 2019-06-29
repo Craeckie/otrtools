@@ -16,12 +16,13 @@ from .episode_lists import get_episode_list
 from .forms import MovieIndexForm, SeriesAddForm
 from .models import Series
 
-sortkeyfn = lambda t:t['title']
+sortkeyfn = lambda t: t['title']
+
 
 def group_titles(titles):
     res = []
     num = 0;
-    for k,values in groupby(titles, sortkeyfn):
+    for k, values in groupby(titles, sortkeyfn):
         # print(k)
         values = list(values)
         for i in range(0, len(values)):
@@ -31,7 +32,7 @@ def group_titles(titles):
         item_count = len(seconds)
         time = timedelta(seconds=sum(seconds) / item_count)
 
-        res.append(Title(k, time, values, isSimilarDecoded, num)) #{'title': k, 'length': time, 'items':list(values)})
+        res.append(Title(k, time, values, isSimilarDecoded, num))  # {'title': k, 'length': time, 'items':list(values)})
     return res
 
 
@@ -66,6 +67,7 @@ class MovieView(BaseView):
     # else:
     #     form = MovieIndexForm()
 
+
 class SeriesView(BaseView):
     template_name = 'searcher/series.html'
     form_class = SeriesAddForm
@@ -96,22 +98,23 @@ class SeriesView(BaseView):
 
     def get_season_episodes(self, series, season):
         url = series.url.format(season=season)
-        episodelist = get_episode_list(website=series.website, url=url, series=series.series, german=series.german, otrNameFormat=series.otrNameFormat)
+        episodelist = get_episode_list(website=series.website, url=url, series=series.series, german=series.german,
+                                       otrNameFormat=series.otrNameFormat)
         refreshKeys()
         episodes = []
         with Pool(4) as p:
-          episodes = list(p.starmap(self.getEpisodeTitles, zip(
-              repeat(url),
-              repeat(series),
-              episodelist
-          )))
+            episodes = list(p.starmap(self.getEpisodeTitles, zip(
+                repeat(url),
+                repeat(series),
+                episodelist
+            )))
         return episodes
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['serieslist'] = []
         for s in Series.objects.all():
-          ctx['serieslist'].append((s, s._meta))
+            ctx['serieslist'].append((s, s._meta))
 
         if all(x in self.kwargs for x in ['series', 'season']):
             series = get_object_or_404(Series, pk=self.kwargs['series'])
@@ -120,67 +123,68 @@ class SeriesView(BaseView):
             if season <= 0:
                 episodes = []
                 for i in series.get_season_range():
-                  episodes.extend(self.get_season_episodes(series, i))
+                    episodes.extend(self.get_season_episodes(series, i))
             else:
                 episodes = self.get_season_episodes(series, season)
-
-
 
             ctx['episodes'] = episodes
 
         return ctx
 
+
 def cutlist_test(request):
     return render(request, 'searcher/cutlists.html', {})
+
+
 def cutlist(request, file):
-  # json = {'items': [{'id': 322848,
-  #    'name': 'Lethal Weapon  Best Buds',
-  #    'airDate': '2016-10-05T20:00:00+02:00',
-  #    'uploadDate': '2016-10-08T22:25:06+02:00',
-  #    'otrkey': 'Lethal_Weapon__Best_Buds_16.10.05_20-00_uswnyw_60_TVOON_DE.mpg.HQ.avi',
-  #    'comment': 'inkl. Vorschau, cut with Super OTR (Super OTR 0.9.6.0b79)',
-  #    'suggestedName': 'Lethal Weapon - S01E03 - Best Buds',
-  #    'channel': 'uswnyw',
-  #    'author': 'Hummel',
-  #    'rating': {'avg': '0.00', 'n': 0, 'author': 5},
-  #    'hits': 2,
-  #    'duration': '00:43:20',
-  #    'quality': 'hq',
-  #    'cutCount': 6,
-  #    'errors': {'start': False,
-  #     'end': False,
-  #     'video': False,
-  #     'audio': False,
-  #     'other': False,
-  #     'epg': False,
-  #     'epgDesc': None,
-  #     'otherDesc': None},
-  #    '_my': {'canRate': True}},
-  #   {'id': 324225,
-  #    'name': 'Lethal Weapon  Best Buds',
-  #    'airDate': '2016-10-05T20:00:00+02:00',
-  #    'uploadDate': '2016-10-06T23:32:15+02:00',
-  #    'otrkey': 'Lethal_Weapon__Best_Buds_16.10.05_20-00_uswnyw_60_TVOON_DE.mpg.HQ.avi',
-  #    'comment': None,
-  #    'suggestedName': 'Lethal Weapon - S01E03 - Best Buds - HQ',
-  #    'channel': 'uswnyw',
-  #    'author': 'katteld1',
-  #    'rating': {'avg': '5.00', 'n': 3, 'author': 5},
-  #    'hits': 46,
-  #    'duration': '00:42:56',
-  #    'quality': 'hq',
-  #    'cutCount': 6,
-  #    'errors': {'start': False,
-  #     'end': False,
-  #     'video': False,
-  #     'audio': False,
-  #     'other': False,
-  #     'epg': False,
-  #     'epgDesc': None,
-  #     'otherDesc': None},
-  #    '_my': {'canRate': True}}],
-  #    'hasMore': False,
-  #    'currentPage': 0}
+    # json = {'items': [{'id': 322848,
+    #    'name': 'Lethal Weapon  Best Buds',
+    #    'airDate': '2016-10-05T20:00:00+02:00',
+    #    'uploadDate': '2016-10-08T22:25:06+02:00',
+    #    'otrkey': 'Lethal_Weapon__Best_Buds_16.10.05_20-00_uswnyw_60_TVOON_DE.mpg.HQ.avi',
+    #    'comment': 'inkl. Vorschau, cut with Super OTR (Super OTR 0.9.6.0b79)',
+    #    'suggestedName': 'Lethal Weapon - S01E03 - Best Buds',
+    #    'channel': 'uswnyw',
+    #    'author': 'Hummel',
+    #    'rating': {'avg': '0.00', 'n': 0, 'author': 5},
+    #    'hits': 2,
+    #    'duration': '00:43:20',
+    #    'quality': 'hq',
+    #    'cutCount': 6,
+    #    'errors': {'start': False,
+    #     'end': False,
+    #     'video': False,
+    #     'audio': False,
+    #     'other': False,
+    #     'epg': False,
+    #     'epgDesc': None,
+    #     'otherDesc': None},
+    #    '_my': {'canRate': True}},
+    #   {'id': 324225,
+    #    'name': 'Lethal Weapon  Best Buds',
+    #    'airDate': '2016-10-05T20:00:00+02:00',
+    #    'uploadDate': '2016-10-06T23:32:15+02:00',
+    #    'otrkey': 'Lethal_Weapon__Best_Buds_16.10.05_20-00_uswnyw_60_TVOON_DE.mpg.HQ.avi',
+    #    'comment': None,
+    #    'suggestedName': 'Lethal Weapon - S01E03 - Best Buds - HQ',
+    #    'channel': 'uswnyw',
+    #    'author': 'katteld1',
+    #    'rating': {'avg': '5.00', 'n': 3, 'author': 5},
+    #    'hits': 46,
+    #    'duration': '00:42:56',
+    #    'quality': 'hq',
+    #    'cutCount': 6,
+    #    'errors': {'start': False,
+    #     'end': False,
+    #     'video': False,
+    #     'audio': False,
+    #     'other': False,
+    #     'epg': False,
+    #     'epgDesc': None,
+    #     'otherDesc': None},
+    #    '_my': {'canRate': True}}],
+    #    'hasMore': False,
+    #    'currentPage': 0}
     data = '{"conds":[{"query":"%s","field":"name"}],"isOrConnection":false,"sortBy":"datebroadcast","isAsc":true,"page":0}' % file
     # print(data)
     resp = requests.post('http://www.cutlist.at/api/search-by', data=data)
@@ -192,6 +196,7 @@ def cutlist(request, file):
     # print(items)
     # return JsonResponse(resp.json())
     return JsonResponse({'items': items})
+
 
 def clearCache(request):
     getTitles.cache_clear()

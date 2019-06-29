@@ -4,6 +4,7 @@ from crispy_forms.layout import Submit
 
 from .models import Series
 
+
 class MovieIndexForm(forms.Form):
     query = forms.CharField(
         label="Query to otrkeyfinder.de",
@@ -13,12 +14,14 @@ class MovieIndexForm(forms.Form):
     min_duration = forms.IntegerField(initial=80, min_value=0, max_value=500, label="Minimum duration")
     max_page = forms.IntegerField(initial=20, min_value=1, max_value=50, label="Maximum pages")
     start_page = forms.IntegerField(initial=1, min_value=0, max_value=30, label="Start page")
+
     @property
     def helper(self):
         helper = FormHelper()
         helper.form_method = 'post'
         helper.add_input(Submit('submit', 'Search'))
         return helper
+
 
 class SimpleSearchForm(MovieIndexForm):
     # class Meta:
@@ -31,6 +34,7 @@ class SimpleSearchForm(MovieIndexForm):
         self.fields['max_page'].widget = forms.HiddenInput()
         self.fields['min_duration'].widget = forms.HiddenInput()
         self.fields['start_page'].widget = forms.HiddenInput()
+
 
 class SeriesAddForm(forms.ModelForm):
     class Meta:
@@ -46,10 +50,11 @@ class SeriesAddForm(forms.ModelForm):
         }
         widgets = {
             'website': forms.Select(choices=(
-              ('IM', 'IMDB'),
-              ('SJ', 'Serienjunkies'),
-              )),
-            'otrNameFormat': forms.TextInput(attrs={'placeholder': "{OTRserise} S{season:02d}E{episode:02d} {OTRtitle}"})
+                ('IM', 'IMDB'),
+                ('SJ', 'Serienjunkies'),
+            )),
+            'otrNameFormat': forms.TextInput(
+                attrs={'placeholder': "{OTRserise} S{season:02d}E{episode:02d} {OTRtitle}"})
         }
 
     @property

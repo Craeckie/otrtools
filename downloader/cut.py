@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-#from sys import argv
+# from sys import argv
 import argparse
 import re, subprocess, os, shutil, sys, traceback
 from urllib3 import util as url_util
@@ -12,23 +12,24 @@ from .cutlist import get_cutlist
 
 script_path = os.path.dirname(os.path.realpath(__file__))
 
+
 def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=False):
     if not os.path.exists(video_base):
-      os.mkdir(video_base)
+        os.mkdir(video_base)
     cutlist = get_cutlist(cutlist_path, video_base)
 
     video_info = parse_media_name(video).groups()
     if not video_info:
-      print("Couldn't parse OTR video name!")
-      return None
+        print("Couldn't parse OTR video name!")
+        return None
 
     # If audio file passed, merge it with video
     if audio:
-      dest = merge(video, audio, video_base)
-      if not dest:
-          return False
-      else:
-          video = dest
+        dest = merge(video, audio, video_base)
+        if not dest:
+            return False
+        else:
+            video = dest
     # Get list of key frames
     print("Searching all keyframes..")
 
@@ -43,59 +44,59 @@ def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=Fal
     # The cutting into pieces
     cut_files = None
     try:
-        (cut_files, concat_list_path) = cut_video(settings.CUT_ENCODER, cutlist, video, video_base, keyframe_list, meta_comment)
+        (cut_files, concat_list_path) = cut_video(settings.CUT_ENCODER, cutlist, video, video_base, keyframe_list,
+                                                  meta_comment)
     except Exception as e:
         print(f"Cutting failed!")
         traceback.print_exc()
 
     destPath = None
     if cut_files:
-        if len(cut_files) == 0: # No cut in cutlist
-          print("Error: No cuts found in cutlist!")
-          return False
+        if len(cut_files) == 0:  # No cut in cutlist
+            print("Error: No cuts found in cutlist!")
+            return False
         if not os.path.exists(settings.DEST_DIR):
-          os.mkdir(settings.DEST_DIR)
+            os.mkdir(settings.DEST_DIR)
         if not destName:
             destName = get_real_name(video, settings.DEST_EXT)
         destPath = os.path.abspath(os.path.join(settings.DEST_DIR, destName))
 
         print(f'Saving to "{destPath}"')
         if len(cut_files) > 1:
-          # concatenate the cuts
-          extra_flags = []
-          if video.endswith(".avi"):
-            extra_flags += ["-fflags", "+genpts"]
-          if video_info and \
-             settings.CUT_EXT == "mkv" and \
-             any(ext in video_info['extension'] for ext in ('HQ', 'HD')):
-
+            # concatenate the cuts
+            extra_flags = []
+            if video.endswith(".avi"):
+                extra_flags += ["-fflags", "+genpts"]
+            if video_info and \
+                    settings.CUT_EXT == "mkv" and \
+                    any(ext in video_info['extension'] for ext in ('HQ', 'HD')):
                 print("Converting with h264_mp4toannexb")
                 extra_flags += ['-bsf:v', 'h264_mp4toannexb']
-          args = [settings.CUT_ENCODER,
-            '-hide_banner',
-            '-f', 'concat'] + extra_flags + ['-i', concat_list_path,
-            '-c:v', 'copy',
-            '-c:a', 'copy',
-            '-map', '0',
-            '-metadata', 'comment=' + meta_comment,
-            '-y', destPath]
-          print("Arguments: %s" % str(args))
-          res = subprocess.call(args);
+            args = [settings.CUT_ENCODER,
+                    '-hide_banner',
+                    '-f', 'concat'] + extra_flags + ['-i', concat_list_path,
+                                                     '-c:v', 'copy',
+                                                     '-c:a', 'copy',
+                                                     '-map', '0',
+                                                     '-metadata', 'comment=' + meta_comment,
+                                                     '-y', destPath]
+            print("Arguments: %s" % str(args))
+            res = subprocess.call(args);
 
-          if res != 0:
-            print("Concatenation failed!")
-            return False
+            if res != 0:
+                print("Concatenation failed!")
+                return False
 
-          os.remove(concat_list_path)
+            os.remove(concat_list_path)
 
-          # Remove cut files
-          # for cur_cut_file in cut_files:
-          #   print("Removing " + cur_cut_file)
-          #   os.remove(cur_cut_file)
+            # Remove cut files
+            # for cur_cut_file in cut_files:
+            #   print("Removing " + cur_cut_file)
+            #   os.remove(cur_cut_file)
 
         elif len(cut_files) == 1:
-          print("Only one cut, just moving cut file")
-          shutil.move(cut_files[0], destPath)
+            print("Only one cut, just moving cut file")
+            shutil.move(cut_files[0], destPath)
         print(f"Video saved to {destPath}")
 
         # Fix permissions?
@@ -107,6 +108,7 @@ def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=Fal
         print("Cutting failed!")
 
     return destPath
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -132,13 +134,13 @@ if __name__ == '__main__':
     cutlist = args.cutlist
 
     if os.path.exists(video):
-      video = os.path.realpath(video)
+        video = os.path.realpath(video)
     if not video:
-      print("A valid video name or URL must be provided!")
-      sys.exit(1)
+        print("A valid video name or URL must be provided!")
+        sys.exit(1)
     if not cutlist:
-      print("A cutlist must be provided!")
-      sys.exit(1)
+        print("A cutlist must be provided!")
+        sys.exit(1)
 
     # Create a working directory and move our video here
     if args.decrypt:
@@ -153,7 +155,6 @@ if __name__ == '__main__':
             if not audio:
                 print("Decryption of audio failed!")
                 sys.exit(1)
-
 
     video_base = re.match("^(.*)\.[a-zA-Z0-9]+$", video).group(1)
     print("Video Base (and cwd): " + video_base)

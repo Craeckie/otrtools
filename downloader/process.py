@@ -13,12 +13,13 @@ from django.conf import settings
 
 wwwdir = settings.WWW_DIR
 # homedir = os.environ['HOME']
-#php_path = os.path.join(homedir, 'php/')
+# php_path = os.path.join(homedir, 'php/')
 # php_path = os.path.join('.', 'php/')
 
 temp_path = settings.CUT_DIR
 
-#regex_otrkey = re.compile("[A-Za-z0-9_-]+([0-9]{2}\.){2}[0-9]{2}_[0-9]{2}-[0-9]{2}_[A-Za-z0-9_]+\.[a-zA-Z4.]+\.otrkey")
+
+# regex_otrkey = re.compile("[A-Za-z0-9_-]+([0-9]{2}\.){2}[0-9]{2}_[0-9]{2}-[0-9]{2}_[A-Za-z0-9_]+\.[a-zA-Z4.]+\.otrkey")
 
 class MediaInformation:
     def __init__(self, url):
@@ -28,14 +29,17 @@ class MediaInformation:
         match = parse_base_name(self.url)
         if match:
             return match.group('name')
+
     def get_otrkey(self, dest_path=''):
         match = parse_media_name(self.url)
         if match:
             return os.path.join(dest_path, match.group(0))
+
     def get_decrypted(self, dest_path=''):
         otrkey = self.get_otrkey(dest_path)
 
         return getDecryptedName(otrkey)
+
 
 @shared_task
 def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCount=0):
@@ -66,17 +70,15 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
     logpath = video.get_decrypted(settings.LOG_DIR)
     print("Log path: %s" % logpath)
     if os.path.exists(logpath):
-      print("Log directory already exists!")
+        print("Log directory already exists!")
     else:
-      print(f"Creating log dir at {logpath}")
-      os.makedirs(logpath)
+        print(f"Creating log dir at {logpath}")
+        os.makedirs(logpath)
         # for source, dest in {'log-index.php':'index.php', 'read-log.php':'read-log.php'}.items():
         #     srcpath = os.path.join(php_path, source)
         #     destpath = os.path.join(logpath, dest)
         #     print("Copying %s -> %s" %(srcpath, destpath))
         #     shutil.copy(srcpath, destpath)
-
-
 
     print(f"Video:\t{video_url}")
     if audio:
@@ -92,35 +94,35 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
 
     if listfile:
         if download(listfile, video, dest_path=dest_path, audio=audio) != 0:
-          print("Download failed! :(")
-          return False
+            print("Download failed! :(")
+            return False
         else:
-          if os.path.exists(video.get_otrkey(dest_path)):
-              print("Download successful! :)")
-              print(f"Removing listfile at {listfile}")
-              os.remove(listfile)
-          else:
-              print("Download finished, but couldn't find downloaded file! :(")
-              return False
+            if os.path.exists(video.get_otrkey(dest_path)):
+                print("Download successful! :)")
+                print(f"Removing listfile at {listfile}")
+                os.remove(listfile)
+            else:
+                print("Download finished, but couldn't find downloaded file! :(")
+                return False
     else:
         print("Already decrypted, moving forward")
 
-
     if not os.path.exists(video.get_decrypted(dest_path)):
         if not decrypt(video.get_otrkey(dest_path), video.get_decrypted(dest_path)):
-          return False
+            return False
     if audio and not os.path.exists(audio.get_decrypted(dest_path)):
         if not decrypt(audio.get_otrkey(dest_path), audio.get_decrypted(dest_path)):
-          return False
+            return False
 
-    #video_path = os.path.join(dest_path, video)
-    #audio_path = None
-    #if audio:
+    # video_path = os.path.join(dest_path, video)
+    # audio_path = None
+    # if audio:
     #    audio_path = os.path.join(dest_path, audio)
 
     if cutlist:
         print("Starting cutting..")
-        if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None, destName=destName, keepTemp=keep):
+        if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path,
+               audio=audio.get_decrypted(dest_path) if audio else None, destName=destName, keepTemp=keep):
             return True
         else:
             print("Cutting failed!")
@@ -129,11 +131,11 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
         print("Not cutting!")
         # If audio file passed, merge it with video
         if audio:
-          dest = merge(video.get_decrypted(dest_path), audio.get_decrypted(dest_path), video_base)
-          if not dest:
-              return False
-          else:
-              video = dest
+            dest = merge(video.get_decrypted(dest_path), audio.get_decrypted(dest_path), video_base)
+            if not dest:
+                return False
+            else:
+                video = dest
         else:
             video = video.get_decrypted(dest_path)
         if not destName:
@@ -142,6 +144,7 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
         shutil.move(video, destPath)
         print(f"Video saved to {destPath}")
         return True
+
 
 def main():
     parser = ArgumentParser()
@@ -159,15 +162,15 @@ def main():
 
     video_url = args.video
     if not video_url or parse.urlparse(video_url).scheme not in ['http', 'https', 'ftp', 'ftps']:
-      print("A video URL must be provided!")
-      return False
+        print("A video URL must be provided!")
+        return False
 
     audio_url = args.audio
 
     cutlist = args.cutlist
     if not cutlist:
-      print("A cutlist URL must be provided!")
-      return False
+        print("A cutlist URL must be provided!")
+        return False
 
     # mega = False
     # if args.m:
@@ -176,6 +179,7 @@ def main():
 
     return process(video_url, cutlist, audio_url)
 
+
 if __name__ == 'main':
     if not main():
-      sys.exit(1)
+        sys.exit(1)

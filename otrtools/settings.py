@@ -15,7 +15,6 @@ import os
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
@@ -26,7 +25,6 @@ SECRET_KEY = 'pvw@df5r2*xi#b(boz)acdo6a#&qcmk@=kzeszdw5q51710mrj'
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -77,7 +75,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'otrtools.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
@@ -87,7 +84,6 @@ DATABASES = {
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
@@ -107,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
@@ -122,15 +117,14 @@ USE_L10N = True
 USE_TZ = True
 
 import djcelery
+
 djcelery.setup_loader()
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 STATIC_URL = '/static/'
-
 
 WWW_DIR = os.path.join(BASE_DIR, 'www/')
 
@@ -150,14 +144,14 @@ FORMAT_PRIORITIES = [
 # Workers / Message Queue
 CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
 BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
-#BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+# BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 # Downloading
 DATENKELLER_QUEUE_REFRESH = 20
 DATENKELLER_INVALID_STATE_WAIT = 60
-DATENKELLER_INVALID_STATE_RETRY = 3
+DATENKELLER_INVALID_STATE_RETRY = 6
 DATENKELLER_INVALID_STATE_REQUEUE = 20
 
 # Decryption
@@ -166,7 +160,7 @@ OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
 # Cutting
 CUT_ENCODER = "ffmpeg"
 CUT_KEYFRAME_LISTER = "keyframe-list"
-CUT_EXT = "avi" # might work better with mkv
+CUT_EXT = "avi"  # might work better with mkv
 CUT_DIR = os.path.join(WWW_DIR, 'temp')
 
 # Saving video files
@@ -179,7 +173,7 @@ MEDIA_URL = '/media/'
 LOG_DIR = os.path.join(WWW_DIR, 'logs/')
 
 # Production settings (keep at the end)
-PRODUCTION_SETTINGS_PATH=os.path.join(os.path.dirname(__file__), "production.py")
+PRODUCTION_SETTINGS_PATH = os.path.join(os.path.dirname(__file__), "production.py")
 if os.path.isfile(PRODUCTION_SETTINGS_PATH):
-  print("Loading production settings..")
-  from .production import *
+    print("Loading production settings..")
+    from .production import *
