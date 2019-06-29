@@ -120,7 +120,7 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
 
     if cutlist:
         print("Starting cutting..")
-        if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None, destName=destName):
+        if cut(video.get_decrypted(dest_path), cutlist, video_base=dest_path, audio=audio.get_decrypted(dest_path) if audio else None, destName=destName, keepTemp=keep):
             return True
         else:
             print("Cutting failed!")
