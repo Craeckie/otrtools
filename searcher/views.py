@@ -75,7 +75,7 @@ class SeriesView(BaseView):
     def getEpisodeTitles(self, url, series, episode):
         # title = toOTRName(episode['title'])
         # query = toOTRName(series)
-        results = getTitles(search=episode['search'], page_start=0, page_num=1, min_dur=40)
+        results = getTitles(search=episode['search'], page_start=0, page_num=1, min_dur=20)
         episode['otr'] = results
         episode['decoded'] = any(r for r in results if r['isDecoded'])
         episode['url'] = urllib.parse.urljoin(url, episode['url'])
