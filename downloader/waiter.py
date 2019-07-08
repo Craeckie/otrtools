@@ -104,6 +104,7 @@ def get_dl_url(url, otrkey=None, restart_args=None):
                 print(f"Requeueing {otrkey}, count: {count}!")
                 restart_args['tryCount'] = count
                 process.process.delay(**restart_args)
+                raise RuntimeError(f"Requeued {otrkey}, aborting process.")
             else:
                 print(f"Reached maximum requeues for {otrkey}. Not retrying!")
                 raise e

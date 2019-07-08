@@ -29,9 +29,12 @@ def prepare_download(video, dest_path, audio=None, restart_args=None):
     if not results:
         return None
     for r in results:
-        (url, otrkey) = r.get()
-        print(f"New url: {url} for {otrkey}")
-        add_download_list(listfile, url, dest_path, otrkey)
+        if r:
+            (url, otrkey) = r.get()
+            print(f"New url: {url} for {otrkey}")
+            add_download_list(listfile, url, dest_path, otrkey)
+        else:
+            print("No result returned from waiter!")
     return listfile
 
 def add_download_list(listfile, url, dest_path, filename):
