@@ -169,6 +169,7 @@ DEST_EXT = "avi"
 SERIES_NAME_FORMAT = '{series} s{season:02}e{episode:02} - {title}.{extension}'
 MEDIA_URL = '/media/'
 DEST_CHOWN_USER, DEST_CHOWN_GROUP = None, None
+DEST_CHMOD = None
 
 # Logging
 LOG_DIR = os.path.join(WWW_DIR, 'logs/')

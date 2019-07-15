@@ -144,6 +144,8 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
         shutil.move(video, destPath)
         if settings.DEST_CHOWN_USER or settings.DEST_CHOWN_GROUP:
             shutil.chown(destPath, user=settings.DEST_CHOWN_USER, group=settings.DEST_CHOWN_GROUP)
+        if settings.DEST_CHMOD:
+            os.chmod(destPath, settings.DEST_CHMOD)
         print(f"Video saved to {destPath}")
         return True
 

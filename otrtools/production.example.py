@@ -15,3 +15,4 @@ CUT_DIR = os.path.join(os.environ['HOME'], 'temp')
 
 DEST_DIR = os.path.join(WWW_DIR, 'videos')
 DEST_CHOWN_USER, DEST_CHOWN_GROUP = 1000, 1000
+DEST_CHMOD = 664

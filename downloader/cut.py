@@ -99,6 +99,8 @@ def cut(video, cutlist_path, video_base, audio=None, destName=None, keepTemp=Fal
             shutil.move(cut_files[0], destPath)
         if settings.DEST_CHOWN_USER or settings.DEST_CHOWN_GROUP:
             shutil.chown(destPath, user=settings.DEST_CHOWN_USER, group=settings.DEST_CHOWN_GROUP)
+        if settings.DEST_CHMOD:
+            os.chmod(destPath, settings.DEST_CHMOD)
         print(f"Video saved to {destPath}")
 
 
