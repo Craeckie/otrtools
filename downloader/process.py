@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from celery import shared_task
+from celery import shared_task, events
 import re, os, shutil, sys
 from argparse import ArgumentParser
 from urllib import parse
@@ -142,10 +142,10 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
             destName = get_real_name(video, settings.DEST_EXT, isUncut=True)
         destPath = os.path.abspath(os.path.join(settings.DEST_DIR, destName))
         shutil.move(video, destPath)
-        if settings.DEST_CHOWN_USER or settings.DEST_CHOWN_GROUP:
-            shutil.chown(destPath, user=settings.DEST_CHOWN_USER, group=settings.DEST_CHOWN_GROUP)
         if settings.DEST_CHMOD:
             os.chmod(destPath, settings.DEST_CHMOD)
+        if settings.DEST_CHOWN_USER or settings.DEST_CHOWN_GROUP:
+            shutil.chown(destPath, user=settings.DEST_CHOWN_USER, group=settings.DEST_CHOWN_GROUP)
         print(f"Video saved to {destPath}")
         return True
 
