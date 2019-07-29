@@ -9,17 +9,17 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item{% if page == "movies" %} active{% endif %}">
-          <a class="nav-link" href="{% if page == "movies" %}#{% else %}{% url 'searcher:movies' %}{% endif %}">Movies <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="{% url 'searcher:movies' %}">Movies <span class="sr-only">(current)</span></a>
         </li>
         <li class="nav-item{% if page == "series" %} active{% endif %}">
-          <a class="nav-link" href="{% if page == "series" %}#{% else %}{% url 'searcher:series' %}{% endif %}">Series</a>
+          <a class="nav-link" href="{% url 'searcher:series' %}">Series</a>
         </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             Tools
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <a class="dropdown-item{% if page == "add" %} active{% endif %}" href="{% if page == "add" %}#{% else %}{% url 'downloader:add' %}{% endif %}">Add Manually</a>
+            <a class="dropdown-item{% if page == "add" %} active{% endif %}" href="{% url 'downloader:add' %}">Add Manually</a>
             <a class="dropdown-item" href="#">Show logs..</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a>

@@ -6,6 +6,11 @@
 
 {% block header %}
   {% include 'searcher/modules/header.html' with title="Series" %}
+    <style>
+    .btn-season {
+        margin: 2px 0;
+    }
+    </style>
 {% endblock %}
 
 {% block navbar %}
@@ -26,13 +31,13 @@
             <td><a target="_blank" href="{{ s.get_url }}">{{s.series}}</a></td>
               <td>
                   <a
-                      class="btn btn-secondary btn-sm" type="button"
+                      class="btn btn-secondary btn-sm btn-season" type="button"
                       href="{% url 'searcher:series' series=s.pk season=0 %}"
-                      data-toggle="tooltip" data-placement="top" title="Edit"
+                      data-toggle="tooltip" data-placement="top" title="All Seasons"
                   >All</a>
                   {% for i in s.get_season_range %}
                       <a
-                          class="btn btn-secondary btn-sm" type="button"
+                          class="btn btn-secondary btn-sm btn-season " type="button"
                           href="{% url 'searcher:series' series=s.pk season=i %}"
                           data-toggle="tooltip" data-placement="top" title="Season {{ i }}"
                       >{{ i }}</a>
