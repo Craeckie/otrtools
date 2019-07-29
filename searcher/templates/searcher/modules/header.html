@@ -69,7 +69,7 @@ body > .container {
       if (found_cutlists === true) {
           $(table_id).html(items.join(""));
       } else {
-          $(table_id).html('<tr><td>No cutlist found. <a target="_blank" href="{% url 'downloader:add' %}?video=' + video_url + '">Download without cutting?</a></td></tr>');
+          $(table_id).html('<tr><td>No cutlist found. <a target="_blank" href="{% url 'downloader:add' %}?video=' + video_url + '&dest=' + destName + '">Download without cutting?</a></td></tr>');
       }
     });
   }
