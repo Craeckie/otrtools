@@ -55,7 +55,7 @@ def _datenkeller(url, otrkey=None):
                 time.sleep(settings.DATENKELLER_INVALID_STATE_WAIT)
             if invalid_state_count >= settings.DATENKELLER_INVALID_STATE_RETRY:
                 print(content)
-                raise RuntimeError(f"Error occurred when waiting in Queue of OTR for {otrkey} at URL {url}!")
+                raise RuntimeWarning(f"Error occurred when waiting in Queue of OTR for {otrkey} at URL {url}!")
 
 
 def _simpleOTR(url, otrkey=None):
@@ -94,7 +94,7 @@ def get_dl_url(url, otrkey=None, restart_args=None):
                 raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}! (URL: {new_url})")
             else:
                 return (new_url, otrkey)
-    except RuntimeError as e:
+    except RuntimeWarning as e:
         if restart_args:
             count = 0
             if 'tryCount' in restart_args:
@@ -104,7 +104,7 @@ def get_dl_url(url, otrkey=None, restart_args=None):
                 print(f"Requeueing {otrkey}, count: {count}!")
                 restart_args['tryCount'] = count
                 process.process.delay(**restart_args)
-                raise RuntimeError(f"Requeued {otrkey}, aborting process.")
+                raise RuntimeWarning(f"Requeued {otrkey}, aborting process.")
             else:
                 print(f"Reached maximum requeues for {otrkey}. Not retrying!")
                 raise e
