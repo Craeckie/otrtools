@@ -42,7 +42,7 @@ body > .container {
   function loadCutlists(file_url, destName, video_url, mirror_name, table_id) {
     $(table_id).html("<tr><td>Loading..</td></tr>");
     $.getJSON(file_url, function(data) {
-      items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
+      items = ['<thead><th>Rating</th><th>Downloads</th><th>Comment</th><th>Sug. Name</th><th>Link</th><th>Downloader</th></thead>']
       //console.log(data.items)
       found_cutlists = false;
       $.each(data.items, function (key, item) {
@@ -50,12 +50,14 @@ body > .container {
         row = '<tr>';
         row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
         row += '<td>' + item.hits + '</td>';
+      row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
+      row += '<td style="word-wrap: break-word">' + item.suggestedName + '</td>';
         row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
         row += '<td><a target="_blank" href="{% url 'downloader:add' %}'
           + '?video=' + video_url
           + '&cutlist='  + cutlist_url
           + '&dest='  + destName
-          + '" title="Uses ' + mirror_name + '">To Downloader</a></td>';
+          + '" title="Uses ' + mirror_name + '">Go!</a></td>';
         row += '</tr>';
         items.push(row);
         found_cutlists = true;

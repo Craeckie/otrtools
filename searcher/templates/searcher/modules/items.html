@@ -19,7 +19,7 @@
     </table>
   </td>
   <td>
-    <table class="table" id="cutlist-table-{{ num }}-{{ forloop.counter }}">
+    <table style="table-layout: fixed; width: 100%" class="table" id="cutlist-table-{{ num }}-{{ forloop.counter }}">
       {% if item.isDecoded or hide_cutlists %}
         <tr><td>Already decoded. <a href="javascript:{% cutlist_call item forloop.counter num destName True %}">Load cutlists anyway?</a></td></tr>
       {% endif %}

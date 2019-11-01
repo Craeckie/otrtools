@@ -14,11 +14,13 @@
     </table>
     <script type="text/javascript">
       $.getJSON("{% url 'searcher:cutlist' 'test' %}", function(data) {
-        items = ['<thead><th>Rating</th><th>Downloads</th></thead>']
+        items = ['<thead><th>Rating</th><th>Downloads</th><th>Description</th><th>Sug. Name</th></thead>']
         $.each(data.items, function (key, item) {
           row = '<tr>';
           row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
           row += '<td>' + item.hits + '</td>';
+          row += '<td>' + item.comment + '</td>';
+          row += '<td>' + item.suggestedName + '</td>';
           row += '<td><a href="http://www.cutlist.at/getfile.php?id=' + item.id + '">Link</a></td>';
           row += '</tr>';
           items.push(row);
