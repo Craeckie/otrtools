@@ -53,7 +53,8 @@ def toOTRName(name):
       .replace(':', ' ') \
       .replace('.', '_') \
       .replace('\'s', '_s') \
-      .replace(',', ' ')
+      .replace(',', ' ') \
+      .replace('/', ' ')
       # .replace('-', ' ') \
 
     return re.sub('[^a-zA-Z0-9 _-]+', '', name)
