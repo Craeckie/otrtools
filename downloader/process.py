@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import requests
 from celery import shared_task, events
 import re, os, shutil, sys
 from argparse import ArgumentParser
@@ -42,10 +43,11 @@ class MediaInformation:
 
 
 @shared_task
-def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCount=0):
+def process(video_url, cutlist, session, audio_url=None, destName=None, keep=False, tryCount=0):
     restart_args = {
         'video_url': video_url,
         'cutlist': cutlist,
+        'session': session,
         'audio_url': audio_url,
         'destName': destName,
         'keep': keep,
@@ -90,7 +92,7 @@ def process(video_url, cutlist, audio_url=None, destName=None, keep=False, tryCo
     if destName:
         print(f"Destination:\t{destName}")
 
-    listfile = prepare_download(video, dest_path=dest_path, audio=audio, restart_args=restart_args)
+    listfile = prepare_download(video, session, dest_path=dest_path, audio=audio, restart_args=restart_args)
 
     if listfile:
         if download(listfile, video, dest_path=dest_path, audio=audio) != 0:
@@ -181,7 +183,7 @@ def main():
     #   mega = True
     #   mega_path = "--path=" + os.environ['mega_path']
 
-    return process(video_url, cutlist, audio_url)
+    return process(video_url, cutlist, requests.session(), audio_url)
 
 
 if __name__ == 'main':

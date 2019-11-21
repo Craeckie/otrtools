@@ -1,4 +1,6 @@
 # coding: utf-8
+from builtins import ValueError
+
 import requests, re
 from bs4 import BeautifulSoup
 from django.conf import settings

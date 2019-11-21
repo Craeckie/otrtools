@@ -1,3 +1,4 @@
+import requests
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -6,6 +7,7 @@ from otrtools.views import BaseView
 from .process import process
 from .forms import AddForm
 
+session = requests.session()
 
 class AddView(BaseView):
     template_name = 'downloader/add.html'
@@ -19,7 +21,7 @@ class AddView(BaseView):
         keep = form.cleaned_data.get("keep")
         # mega = form.cleaned_data.get("Mega", False)
         ctx = self.get_context_data(**kwargs)
-        if not process.delay(video, cutlist, audio_url=audio, destName=dest, keep=keep):
+        if not process.delay(video, cutlist, session, audio_url=audio, destName=dest, keep=keep):
             ctx['failed'] = True
 
         return HttpResponseRedirect(reverse('downloader:add'))  # render(self.request, 'downloader/add.html', ctx)

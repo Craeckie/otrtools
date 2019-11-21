@@ -7,10 +7,9 @@ from django.conf import settings
 
 from downloader import process
 
-session = requests.session()
+# session = requests.session()
 
-
-def _datenkeller(url, otrkey=None):
+def _datenkeller(url, session, otrkey=None):
     print("Parsing download link from otr.datenkeller.net")
     m = re.search('(?P<url>https?://otr.datenkeller.net/)?.*file=(?P<file>[^&]+)', url)
     if m:
@@ -58,7 +57,7 @@ def _datenkeller(url, otrkey=None):
                 raise RuntimeWarning(f"Error occurred when waiting in Queue of OTR for {otrkey} at URL {url}!")
 
 
-def _simpleOTR(url, otrkey=None):
+def _simpleOTR(url, session, otrkey=None):
     print("Parsing download link from simple-otr-mirror.de")
     content = session.get(url).text
     match = re.search("<font face=Verdana >wanted file: <a href='(?P<url>[^']+)'", content)
@@ -73,7 +72,7 @@ def _simpleOTR(url, otrkey=None):
         raise Exception(f"Couldn't parse URL for {otrkey}:\n{content}")
 
 
-def get_dl_url(url, otrkey=None, restart_args=None):
+def get_dl_url(url, session, otrkey=None, restart_args=None):
     print(f"get_dl_url for {url}")
     if not url:
         return url
@@ -86,9 +85,9 @@ def get_dl_url(url, otrkey=None, restart_args=None):
 
     try:
         if hostname == 'otr.datenkeller.net':
-            return _datenkeller(new_url, otrkey)
+            return _datenkeller(new_url, session, otrkey)
         elif hostname == 'simple-otr-mirror.de':
-            return _simpleOTR(new_url, otrkey)
+            return _simpleOTR(new_url, session, otrkey)
         else:
             if urlparse(url).hostname == 'otrkeyfinder.com':
                 raise NotImplementedError(f"Can not handle mirror {new_parse_url.hostname}! (URL: {new_url})")
@@ -118,4 +117,4 @@ if __name__ == 'main':
     parser.add_argument("url",
                         help="URL to request download link from otr.datenkeller.at")
     args = parser.parse_args()
-    get_dl_url(args.url)
+    get_dl_url(args.url, requests.session())
