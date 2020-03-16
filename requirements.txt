@@ -1,15 +1,15 @@
 ## The following requirements were added by pip freeze:
 anyjson
 bs4
-celery~=4.2.1
-Django~=2.1.1
-django-celery~=3.2.2
-django-celery-beat~=1.1.1
-django-celery-results~=1.0.1
+celery~=4.4.1
+Django~=3.0.4
+django-celery~=3.3.1
+django-celery-beat~=2.0.0
+django-celery-results~=1.2.1
 django-crispy-forms
-django-filebrowser
+git+https://github.com/sehmaschine/django-filebrowser@stable/3.13.x #django-filebrowser
 django-icons
-flower~=0.9.2
+flower~=0.9.3
 image
 requests
 urllib3
