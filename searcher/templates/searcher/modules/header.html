@@ -48,7 +48,7 @@ body > .container {
       $.each(data.items, function (key, item) {
         cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
         row = '<tr>';
-        row += '<td><span style="color: blue;">' + item.rating.n + "x " + item.rating.avg + '</span></td>';
+        row += '<td><span style="color: blue;">' + item.rating.ratings + "x " + item.rating.avg + '</span></td>';
         row += '<td>' + item.hits + '</td>';
       row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
       row += '<td style="word-wrap: break-word">' + item.suggestedName + '</td>';

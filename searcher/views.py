@@ -191,8 +191,14 @@ def cutlist(request, file):
     json = resp.json()
     # print(json)
     items = [dict(item) for item in json['items']]
-    items = sorted(items, key=itemgetter('hits'), reverse=True)
-    items = sorted(items, key=lambda item: item['rating']['avg'] * min(5, item['rating']['n']), reverse=True)
+    try:
+        items = sorted(items, key=itemgetter('hits'), reverse=True)
+    except:
+        pass
+    try:
+        items = sorted(items, key=lambda item: item['rating']['avg'] * min(5, item['rating']['ratings']), reverse=True)
+    except:
+        pass
     # print(items)
     # return JsonResponse(resp.json())
     return JsonResponse({'items': items})
