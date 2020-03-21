@@ -19,12 +19,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'pvw@df5r2*xi#b(boz)acdo6a#&qcmk@=kzeszdw5q51710mrj'
+SECRET_KEY = os.environ.get('SECRET_KEY', default='pvw@df5r2*xi#b(boz)acdo6a#&qcmk@=kzeszdw5q51710mrj')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', default=False)
 
-ALLOWED_HOSTS = []
+DOMAIN = os.environ.get("DOMAIN")
+if DOMAIN:
+    ALLOWED_HOSTS = [DOMAIN]
+else:
+    ALLOWED_HOSTS = []
 
 # Application definition
 
@@ -142,7 +146,7 @@ FORMAT_PRIORITIES = [
 #CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
 CELERY_RESULT_BACKEND = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
 CELERY_BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
-# BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_URL  = 'amqp://guest:guest@localhost:5672//'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
@@ -158,6 +162,16 @@ DATENKELLER_INVALID_STATE_REQUEUE = 20
 # Decryption
 OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
 
+OTR_USERNAME = os.environ.get('OTR_USERNAME')
+OTR_PASSWORD = os.environ.get('OTR_PASSWORD')
+
+OTRKEY_CACHE = os.environ.get('OTRKEY_CACHE')
+
+DEST_DIR = os.environ.get("DEST_DIR")
+
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "amqp://guest:guest@localhost:5672//")
+
+
 # Cutting
 CUT_ENCODER = "ffmpeg"
 CUT_KEYFRAME_LISTER = "keyframe-list"
@@ -165,12 +179,13 @@ CUT_EXT = "avi"  # might work better with mkv
 CUT_DIR = os.path.join(WWW_DIR, 'temp')
 
 # Saving video files
-DEST_DIR = os.path.join(WWW_DIR, 'videos')
+DEST_DIR = os.environ.get('DEST_DIR', os.path.join(WWW_DIR, 'videos'))
 DEST_EXT = "avi"
 SERIES_NAME_FORMAT = '{series} s{season:02}e{episode:02} - {title}.{extension}'
 MEDIA_URL = '/media/'
-DEST_CHOWN_USER, DEST_CHOWN_GROUP = None, None
-DEST_CHMOD = None
+MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(WWW_DIR, 'www/'))
+DEST_CHOWN_USER, DEST_CHOWN_GROUP = os.environ.get('DEST_CHOWN_USER'), os.environ.get('DEST_CHOWN_GROUP')
+DEST_CHMOD = os.environ.get('DEST_CHMOD')
 
 # Logging
 LOG_DIR = os.path.join(WWW_DIR, 'logs/')
