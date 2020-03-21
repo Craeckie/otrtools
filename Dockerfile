@@ -79,6 +79,7 @@ ADD docker/uwsgi_params docker/uwsgi.ini "$wwwdir/"
 #     mkdir -p /usr/lib/rabbitmq/ && chown -R rabbitmq /usr/lib/rabbitmq/
 ADD ./ "$REPO_DIR"
 WORKDIR "$REPO_DIR"
+RUN chown www-data:www-data -R "$wwwdir"
 
 EXPOSE 80
 #CMD ["bash", "/root/run.sh"]
