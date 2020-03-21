@@ -176,7 +176,7 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "amqp://guest:guest@loca
 CUT_ENCODER = "ffmpeg"
 CUT_KEYFRAME_LISTER = "keyframe-list"
 CUT_EXT = "avi"  # might work better with mkv
-CUT_DIR = os.path.join(WWW_DIR, 'temp')
+CUT_DIR = os.environ.get("CUT_DIR", os.path.join(WWW_DIR, 'temp'))
 
 # Saving video files
 DEST_DIR = os.environ.get('DEST_DIR', os.path.join(WWW_DIR, 'videos'))
