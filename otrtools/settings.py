@@ -142,8 +142,9 @@ FORMAT_PRIORITIES = [
 ]
 
 # Workers / Message Queue
-CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
-BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
+#CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
+CELERY_BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
 # BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/

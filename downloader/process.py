@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import requests
-from celery import shared_task, events
+from otrtools.celery import app #shared_task, events
 import re, os, shutil, sys
 from argparse import ArgumentParser
 from urllib import parse
@@ -42,7 +42,7 @@ class MediaInformation:
         return getDecryptedName(otrkey)
 
 
-@shared_task
+@app.task()
 def process(video_url, cutlist, session, audio_url=None, destName=None, keep=False, tryCount=0):
     restart_args = {
         'video_url': video_url,
