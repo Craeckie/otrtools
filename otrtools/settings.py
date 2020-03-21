@@ -85,6 +85,8 @@ DATABASES = {
     }
 }
 
+SESSION_SERIALIZER = 'django.contrib.sessions.serializers.PickleSerializer'
+
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators
 
@@ -107,17 +109,12 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_L10N = True
-
 USE_TZ = True
 
 import djcelery
-
 djcelery.setup_loader()
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
@@ -142,11 +139,15 @@ FORMAT_PRIORITIES = [
 ]
 
 # Workers / Message Queue
-CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
-BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
+#CELERY_RESULT_BACKEND = 'amqp://guest:guest@localhost:5672//'
+CELERY_RESULT_BACKEND = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
+CELERY_BROKER_URL = 'amqp://my_user:YiMkX-8xwew_Uqp9m9_GGTkCMHMV7p3@localhost:5672/vhost'
 # BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
+
+CELERY_ACCEPT_CONTENT = ['pickle']
+CELERY_TASK_SERIALIZER = 'pickle'
 
 # Downloading
 DATENKELLER_QUEUE_REFRESH = 20
