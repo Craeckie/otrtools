@@ -70,15 +70,15 @@ RUN apt update && apt install -y build-essential automake libtool uwsgi uwsgi-pl
 
 ADD docker/crontab /etc/cron.d/sync-keys-cron
 
-ADD requirements.txt run.sh ./
-RUN python3 -m pip install --upgrade pip setuptools wheel pillow && python3 -m pip install --upgrade -r requirements.txt
-
-WORKDIR "$wwwdir"
 ADD docker/uwsgi_params docker/uwsgi.ini "$wwwdir/"
-# RUN chown www-data:www-data -R "$wwwdir" && \
-#     mkdir -p /usr/lib/rabbitmq/ && chown -R rabbitmq /usr/lib/rabbitmq/
 ADD ./ "$REPO_DIR"
 WORKDIR "$REPO_DIR"
+RUN virtualenv env && ./env/bin/activate && \
+    python3 -m pip install --upgrade pip setuptools wheel pillow && \
+    python3 -m pip install --upgrade -r requirements.txt
+
+# RUN chown www-data:www-data -R "$wwwdir" && \
+#     mkdir -p /usr/lib/rabbitmq/ && chown -R rabbitmq /usr/lib/rabbitmq/
 RUN chown www-data:www-data -R "$wwwdir"
 
 EXPOSE 80
