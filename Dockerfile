@@ -61,7 +61,7 @@ RUN apt update && apt install -y --no-install-recommends aria2 ncftp python3 pyt
 ADD docker/otrtool-build.sh docker/keyframe-list-build.sh keyframe-list/keyframe-list.c ./
 #ADD https://api.github.com/repos/otrtool/otrtool/git/refs/heads/master /dev/null
 #RUN apk add --virtual .build autoconf automake libtool ffmpeg-dev \
-RUN apt update && apt install -y build-essential automake libtool uwsgi \
+RUN apt update && apt install -y build-essential automake libtool uwsgi uwsgi-plugin-python3 \
     && bash otrtool-build.sh \
     && bash keyframe-list-build.sh \
     && apt-get autoremove -y \

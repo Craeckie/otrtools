@@ -13,3 +13,4 @@ flower~=0.9.3
 image
 requests
 urllib3
+uwsgi
