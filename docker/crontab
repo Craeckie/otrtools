@@ -1,0 +1,4 @@
+# Crontab of user: root
+42 2 * * * root /bin/bash /usr/local/bin/sync-keys > /var/log/sync-keys.log 2>&1
+
+
