@@ -1,6 +1,8 @@
 from django import template
 from django.urls import reverse
 from urllib.parse import quote
+
+from django.utils.html import escapejs
 from django.utils.safestring import mark_safe
 
 register = template.Library()
@@ -27,7 +29,7 @@ def cutlist_call(item, i, num, destName=None, encodeTwice=False):
       ', '.join(map(lambda x: f"'{x}'",
         [
           reverse('searcher:cutlist', kwargs={'file': item['file_decrypted']}),
-          quote(destName) if destName else '',
+          escapejs(destName) if destName else '',
           quote(link) if encodeTwice else link,
           item['chosen_mirror']['name'],
           f'#cutlist-table-{num}-{i}',

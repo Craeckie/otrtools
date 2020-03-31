@@ -9,7 +9,7 @@ django-celery-results~=1.2.1
 django-crispy-forms
 git+https://github.com/sehmaschine/django-filebrowser@stable/3.13.x #django-filebrowser
 django-icons
-flower~=0.9.3
+flower~=0.9.4
 image
 requests
 urllib3
