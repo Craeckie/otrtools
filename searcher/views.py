@@ -1,6 +1,6 @@
 # coding: utf-8
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
 from django.views.generic.edit import CreateView
 import urllib.parse, requests
 from itertools import groupby
@@ -53,11 +53,26 @@ class MovieView(BaseView):
             page_num=max_page,
             min_dur=min_duration)
         grouped = group_titles(titles)
-        ctx = super().get_context_data(**kwargs)
+        ctx = super().get_context_data(form=form, **kwargs)
         ctx['new_titles'] = list(filter(lambda t: not t.isSimilarDecoded, grouped))
         ctx['old_titles'] = list(filter(lambda t: t.isSimilarDecoded, grouped))
 
         return render(self.request, 'searcher/movies.html', ctx)
+
+    def get(self, *args, **kwargs):
+        if 'name' in kwargs:
+            form = MovieIndexForm(data={
+                'query': kwargs.get('name'),
+                'min_duration': 50,
+                'max_page': 5,
+                'start_page': 1,
+            })
+            if form.is_valid():
+                return MovieView.form_valid(self, form, **kwargs)
+            else:
+                return HttpResponseBadRequest("Invalid parameter!")
+        else:
+            return super().get(*args, **kwargs)
     # def request()
     # grouped = []
     # if request.method == 'POST':

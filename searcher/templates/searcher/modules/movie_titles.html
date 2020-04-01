@@ -8,6 +8,7 @@
             <tr><td>{{ t.item_count }}</td></tr>
             <tr><td><a target="_blank" href="https://www.imdb.com/find?q={{ t.title }}&s=all">IMDB</a></td></tr>
             <tr><td><a target="_blank" href="https://www.youtube.com/results?search_query={{ t.title }} Trailer">Youtube Trailer</a></td></tr>
+            <tr><td><a target="_blank" href="{% url 'searcher:movies-search' name=t.title %}">Similar Movies</a></td></tr>
         </table>
     </div></td>
     <td>
