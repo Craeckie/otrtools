@@ -1,16 +1,20 @@
-<table class="table table-striped">
+<table class="table table-striped table-dark">
 {% for t in titles %}
-  <tr>
-    <td><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ t.title }} {{search}}&order=date-name"><span style="{% if t.isDecoded %}text-decoration-line: line-through;{% elif t.isSimilarDecoded %}color: #777777;{% endif %}">{{ t.title }}</span></a></td>
-    <td>{{ t.length }}</td>
-    <td>{{ t.item_count }}</td>
-    <td><a target="_blank" href="https://www.imdb.com/find?q={{ t.title }}&s=all">IMDB</a></td>
-    <td><a target="_blank" href="https://www.youtube.com/results?search_query={{ t.title }} Trailer">Youtube Trailer</a></td>
+<tr>
+    <td><div>
+        <table class="table table-dark text-light bg-dark">
+            <tr><td><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ t.title }} {{search}}&order=date-name"><span style="{% if t.isDecoded %}text-decoration-line: line-through;{% elif t.isSimilarDecoded %}color: #777777;{% endif %}">{{ t.title }}</span></a></td></tr>
+            <tr><td>{{ t.length }}</td></tr>
+            <tr><td>{{ t.item_count }}</td></tr>
+            <tr><td><a target="_blank" href="https://www.imdb.com/find?q={{ t.title }}&s=all">IMDB</a></td></tr>
+            <tr><td><a target="_blank" href="https://www.youtube.com/results?search_query={{ t.title }} Trailer">Youtube Trailer</a></td></tr>
+        </table>
+    </div></td>
     <td>
       <table class="table table-striped">
         {% include "searcher/modules/items.html" with items=t.items num=forloop.counter %}
       </table>
-    </td>
-  </tr>
+    </tr>
+</tr></td>
 {% endfor %}
 </table>
