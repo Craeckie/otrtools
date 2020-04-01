@@ -2,15 +2,15 @@
 <html lang="en">
 <head>
   {% block header %}
-
   {% endblock %}
 </head>
-<body>
+<body class="bg-dark text-white">
   {% block navbar %}
   {% endblock %}
   </br>
   {% block content %}
   {% endblock %}
 
+{% include 'searcher/modules/footer.html' %}
 </body>
 </html>

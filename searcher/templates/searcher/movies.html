@@ -50,8 +50,7 @@
     </div>
     {% endif %}
   </div>
-</body>
-
+    
 <script type="text/javascript">
 function clearCache() {
   $.getJSON('{% url 'searcher:clear-cache' %}', function(data) {
@@ -61,5 +60,4 @@ function clearCache() {
   });
 }
 </script>
-</html>
 {% endblock %}

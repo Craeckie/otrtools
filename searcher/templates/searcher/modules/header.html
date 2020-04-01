@@ -1,9 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha512-bnIvzh6FU75ZKxp0GXLH9bewza/OIw6dLVh9ICg0gogclmYGguQJWl8U30WpbsGTqbIiAwxTsbe76DErLq5EDQ==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
 <title>{{ title }}</title>
 <style media="screen">
@@ -22,6 +20,7 @@ body > .container {
   padding: 60px 15px 0;
 }
 
+
 .footer {
   position: absolute;
   bottom: 0;
@@ -37,42 +36,3 @@ body > .container {
 }
 
 </style>
-
-<script type="text/javascript">
-  function loadCutlists(file_url, destName, video_url, mirror_name, table_id) {
-    $(table_id).html("<tr><td>Loading..</td></tr>");
-    $.getJSON(file_url, function(data) {
-      items = ['<thead><th>Rating</th><th>Downloads</th><th>Comment</th><th>Sug. Name</th><th>Link</th><th>Downloader</th></thead>']
-      //console.log(data.items)
-      found_cutlists = false;
-      $.each(data.items, function (key, item) {
-        cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
-        row = '<tr>';
-        row += '<td><span style="color: blue;">' + item.rating.ratings + "x " + item.rating.avg + '</span></td>';
-        row += '<td>' + item.hits + '</td>';
-      row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
-      row += '<td style="word-wrap: break-word">' + item.suggestedName + '</td>';
-        row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
-        row += '<td><a target="_blank" href="{% url 'downloader:add' %}'
-          + '?video=' + video_url
-          + '&cutlist='  + cutlist_url
-          + '&dest='  + destName
-          + '" title="Uses ' + mirror_name + '">Go!</a></td>';
-        row += '</tr>';
-        items.push(row);
-        found_cutlists = true;
-      });
-      //console.log(items);
-      // for (var item in data) {
-      //   if (data.hasOwnProperty(item)) {
-      //
-      //   }
-      // }
-      if (found_cutlists === true) {
-          $(table_id).html(items.join(""));
-      } else {
-          $(table_id).html('<tr><td>No cutlist found. <a target="_blank" href="{% url 'downloader:add' %}?video=' + video_url + '&dest=' + destName + '">Download without cutting?</a></td></tr>');
-      }
-    });
-  }
-</script>

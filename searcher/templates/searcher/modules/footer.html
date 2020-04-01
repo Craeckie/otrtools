@@ -1,0 +1,40 @@
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  function loadCutlists(file_url, destName, video_url, mirror_name, table_id) {
+    $(table_id).html("<tr><td>Loading..</td></tr>");
+    $.getJSON(file_url, function(data) {
+      items = ['<thead><th>Rating</th><th>Downloads</th><th>Comment</th><th>Sug. Name</th><th>Link</th><th>Downloader</th></thead>']
+      //console.log(data.items)
+      found_cutlists = false;
+      $.each(data.items, function (key, item) {
+        cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
+        row = '<tr>';
+        row += '<td><span style="color: blue;">' + item.rating.ratings + "x " + item.rating.avg + '</span></td>';
+        row += '<td>' + item.hits + '</td>';
+      row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
+      row += '<td style="word-wrap: break-word">' + item.suggestedName + '</td>';
+        row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
+        row += '<td><a target="_blank" href="{% url 'downloader:add' %}'
+          + '?video=' + video_url
+          + '&cutlist='  + cutlist_url
+          + '&dest='  + destName
+          + '" title="Uses ' + mirror_name + '">Go!</a></td>';
+        row += '</tr>';
+        items.push(row);
+        found_cutlists = true;
+      });
+      //console.log(items);
+      // for (var item in data) {
+      //   if (data.hasOwnProperty(item)) {
+      //
+      //   }
+      // }
+      if (found_cutlists === true) {
+          $(table_id).html(items.join(""));
+      } else {
+          $(table_id).html('<tr><td>No cutlist found. <a target="_blank" href="{% url 'downloader:add' %}?video=' + video_url + '&dest=' + destName + '">Download without cutting?</a></td></tr>');
+      }
+    });
+  }
+</script>
