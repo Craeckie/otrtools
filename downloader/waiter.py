@@ -19,7 +19,14 @@ def _datenkeller(url, session, otrkey=None):
 
     invalid_state_count = 0
     while True:
-        content = session.get(url).text
+        try:
+            content = session.get(url).text
+        except requests.exceptions.ConnectionError as e:
+            print(e)
+            print(f'URL: {url}')
+            invalid_state_count += 1
+            time.sleep(settings.DATENKELLER_INVALID_STATE_WAIT)
+            continue
         # e.g.: <a href="#" onclick="startCount(3 , 6, 'c270917a85b5efef5cafb8c6350fd9ad', 'cluster.lastverteiler.net',  'The_100__The_Chosen_17.05.17_21-00_uswpix_60_TVOON_DE.mpg.HQ.avi.otrkey');
         match = re.search(
             "<a href=\"#\" onclick=\"startCount\([0-9]+[ ,]+[0-9]+[ ,]+'([a-zA-Z0-9]+)'[ ,]+'([a-zA-Z0-9.-]+)'[ ,]+'([A-Za-z_0-9.-]+\.otrkey)'",
