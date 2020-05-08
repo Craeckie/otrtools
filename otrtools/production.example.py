@@ -5,8 +5,11 @@ ALLOWED_HOSTS = ['example.com']
 
 # Debug = False
 
-OTR_USERNAME = "someone@example.com"
-OTR_PASSWORD = "secret password"
+# You should use ENV variables instead!
+# OTR_USERNAME = "someone@example.com"
+# OTR_PASSWORD = "secret password"
+# DATENKELLER_USER = "SomeOne123"
+# DATENKELLER_PASSWORD = "VeryStrangePass234"
 
 WWW_DIR = '/var/www/html/'
 

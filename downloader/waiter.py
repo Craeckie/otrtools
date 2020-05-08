@@ -17,6 +17,12 @@ def _datenkeller(url, session, otrkey=None):
         session.head(old_url)  # to get the cookies
         url = m.expand('\g<url>?getFile=\g<file>')
 
+    if settings.DATENKELLER_USER and settings.DATENKELLER_PASSWORD:
+        session.post(url, data={
+            'uname': settings.DATENKELLER_USER,
+            'pass': settings.DATENKELLER_PASSWORD
+        })
+
     invalid_state_count = 0
     while True:
         try:
