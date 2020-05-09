@@ -18,10 +18,25 @@ def _datenkeller(url, session, otrkey=None):
         url = m.expand('\g<url>?getFile=\g<file>')
 
     if settings.DATENKELLER_USER and settings.DATENKELLER_PASSWORD:
-        session.post(url, data={
-            'uname': settings.DATENKELLER_USER,
-            'pass': settings.DATENKELLER_PASSWORD
-        })
+        resp = session.get('url')
+        if resp and resp.status_code == 200:
+            m = re.match("xsrf='([0-9a-eA-E]+)'", resp.text)
+            if m:
+                xsrf = m.group(1)
+                session.post('https://otr.datenkeller.net/index.php', data={
+                    'xjxfun': 'spenderLogin',
+                    'xjxr': 1589061859295,
+                    'xjxargs[]': f'S{settings.DATENKELLER_USER}',
+                    'xjxargs[]': f'S{settings.DATENKELLER_PASSWORD}',
+                    'xjxargs[]': f'S{xsrf}'
+                })
+            else:
+                print('Couldn\'t extract XSRF token!')
+                print('Login at otr.datenkeller.net not possible')
+        else:
+            print('Error: ' + resp.status_code)
+            print('Login at otr.datenkeller.net not possible')
+        #if 'Erfolgreich eingeloggt' in
 
     invalid_state_count = 0
     while True:
