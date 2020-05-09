@@ -36,7 +36,7 @@ RUN apt update && apt install -y build-essential automake libtool uwsgi uwsgi-pl
 
 ADD docker/crontab /etc/cron.d/sync-keys-cron
 
-ADD docker/uwsgi_params docker/uwsgi.ini docker/requirements "$wwwdir/"
+ADD docker/uwsgi_params docker/uwsgi.ini docker/requirements.txt "$wwwdir/"
 
 WORKDIR "$REPO_DIR"
 RUN python3 -m pip install --upgrade pip setuptools wheel pillow virtualenv && \
