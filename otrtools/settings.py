@@ -161,6 +161,9 @@ DATENKELLER_INVALID_STATE_WAIT = 60
 DATENKELLER_INVALID_STATE_RETRY = 10
 DATENKELLER_INVALID_STATE_REQUEUE = 20
 
+DATENKELLER_USER = os.environ.get('DATENKELLER_USER')
+DATENKELLER_PASSWORD = os.environ.get('DATENKELLER_PASSWORD')
+
 # Decryption
 OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
 
@@ -172,7 +175,9 @@ OTRKEY_CACHE = os.environ.get('OTRKEY_CACHE')
 DEST_DIR = os.environ.get("DEST_DIR")
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "amqp://guest:guest@localhost:5672//")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "amqp://guest:guest@localhost:5672//")
 
+FLOWER_HOST = os.environ.get("FLOWER_HOST", "localhost:5555")
 
 # Cutting
 CUT_ENCODER = "ffmpeg"
