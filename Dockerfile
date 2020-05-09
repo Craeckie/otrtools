@@ -36,12 +36,14 @@ RUN apt update && apt install -y build-essential automake libtool uwsgi uwsgi-pl
 
 ADD docker/crontab /etc/cron.d/sync-keys-cron
 
-ADD docker/uwsgi_params docker/uwsgi.ini "$wwwdir/"
-ADD ./ "$REPO_DIR"
+ADD docker/uwsgi_params docker/uwsgi.ini docker/requirements "$wwwdir/"
+
 WORKDIR "$REPO_DIR"
 RUN python3 -m pip install --upgrade pip setuptools wheel pillow virtualenv && \
     virtualenv env && . ./env/bin/activate && \
-    python3 -m pip install --upgrade -r requirements.txt
+    python3 -m pip install --upgrade -r "$wwwdir/requirements.txt"
+
+ADD ./ "$REPO_DIR"
 
 RUN chown www-data:www-data -R "$wwwdir"
 
