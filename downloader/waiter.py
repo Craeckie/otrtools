@@ -19,7 +19,7 @@ def _datenkeller(url, session, otrkey=None):
 
     if settings.DATENKELLER_USER and settings.DATENKELLER_PASSWORD:
         print('Trying to login at otr.datenkeller.net')
-        resp = session.get('url')
+        resp = session.get(url)
         if resp and resp.status_code == 200:
             m = re.match("xsrf='([0-9a-eA-E]+)'", resp.text)
             if m:
