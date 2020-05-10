@@ -21,7 +21,7 @@ def _datenkeller(url, session, otrkey=None):
         print('Trying to login at otr.datenkeller.net')
         resp = session.get(url)
         if resp and resp.status_code == 200:
-            m = re.match("xsrf='([0-9a-eA-E]+)'", resp.text)
+            m = re.search("xsrf='([0-9a-eA-E]+)'", resp.text)
             if m:
                 xsrf = m.group(1)
                 resp = session.post('https://otr.datenkeller.net/index.php', data={
