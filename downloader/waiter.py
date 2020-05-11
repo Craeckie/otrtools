@@ -68,6 +68,11 @@ def _datenkeller(url, session, otrkey=None):
             time.sleep(5)
             return (dl_url, otrkey)
         else:
+            match = re.search('<a class="piwik_download" href="([^"]+)"', content)
+            if match:
+                print("Got the premium link! :)", flush=True)
+                dl_url = match.group(1)
+                return (dl_url, otrkey)
             match = re.search(
                 "<tr bgcolor=lightgrey><td>Deine Position in der Warteschlange: </td><td>([^<]+)</td></tr>", content)
             if otrkey:
