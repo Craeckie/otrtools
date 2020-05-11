@@ -26,13 +26,16 @@ def _datenkeller(url, session, otrkey=None):
                 xsrf = m.group(1)
                 resp = session.post('https://otr.datenkeller.net/index.php', data={
                     'xjxfun': 'spenderLogin',
-                    'xjxr': 1589061859295,
-                    'xjxargs[]': f'S{settings.DATENKELLER_USER}',
-                    'xjxargs[]': f'S{settings.DATENKELLER_PASSWORD}',
-                    'xjxargs[]': f'S{xsrf}'
+                    'xjxr': int(time.time()*1000),
+                    'xjxargs[]': [f'S{settings.DATENKELLER_USER}',
+                                  f'S{settings.DATENKELLER_PASSWORD}',
+                                  f'S{xsrf}']
                 })
                 if resp.status_code == 200 and 'Erfolgreich eingeloggt' in resp.text:
                     print('Successfully logged in')
+                else:
+                    print(f'Couldn\'t login (Code: {resp.status_code}):')
+                    print(resp.text)
             else:
                 print('Couldn\'t extract XSRF token!')
                 print('Login at otr.datenkeller.net not possible')
