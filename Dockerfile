@@ -40,12 +40,12 @@ ADD docker/uwsgi_params docker/uwsgi.ini requirements.txt "$wwwdir/"
 
 WORKDIR "$REPO_DIR"
 RUN python3 -m pip install --upgrade pip setuptools wheel pillow virtualenv && \
-    virtualenv env && . ./env/bin/activate && \
     python3 -m pip install --upgrade -r "$wwwdir/requirements.txt"
+    #virtualenv env && . ./env/bin/activate && \
 
 ADD ./ "$REPO_DIR"
 
 RUN chown www-data:www-data -R "$wwwdir"
 
 EXPOSE 80
-CMD ["uwsgi", "$wwwdir/uwsgi.ini"]
+CMD ["uwsgi", "--config", "$wwwdir/uwsgi.ini"]
