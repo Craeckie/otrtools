@@ -54,7 +54,8 @@ def toOTRName(name):
       .replace(' ', '_') \
       .replace(':', ' ') \
       .replace('.', '_') \
-      .replace('\'s', '_s') \
+      .replace('\'', '_') \
+      .replace(', ', '_') \
       .replace(',', ' ') \
       .replace('/', ' ')
       # .replace('-', ' ') \
