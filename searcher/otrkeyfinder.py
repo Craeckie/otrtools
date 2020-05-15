@@ -1,4 +1,6 @@
 import re, requests, os
+import urllib
+
 from bs4 import BeautifulSoup
 from datetime import timedelta
 from multiprocessing.dummy import Pool
@@ -74,6 +76,8 @@ def parseOtrkeys(otrkey_divs):
                     link = links[0]
                     name = link.string
                     url = link.attrs['href']
+                    if not url.startswith('https://'):
+                        url = urllib.parse.urljoin('https://otrkeyfinder.com/', url)
 
                     mirror = {
                       'name':     name.strip(),
