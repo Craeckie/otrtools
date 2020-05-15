@@ -131,8 +131,8 @@ WWW_DIR = os.path.join(BASE_DIR, 'www/')
 
 # Searching
 MIRROR_PRIORITIES = [
+    'datenkeller.net',
     'simple-otr-mirror.de',
-    'otr.datenkeller.net',
 ]
 
 FORMAT_PRIORITIES = [
