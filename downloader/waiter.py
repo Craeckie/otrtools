@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 # import urllib3
 import time, re, argparse
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urljoin
+
 import requests
 from django.conf import settings
 
@@ -11,11 +12,12 @@ from downloader import process
 
 def _datenkeller(url, session, otrkey=None):
     print("Parsing download link from otr.datenkeller.net")
-    m = re.search('(?P<url>https?://otr.datenkeller.net/)?.*file=(?P<file>[^&]+)', url)
+    m = re.search('.*file=(?P<file>[^&]+)', url)
     if m:
         old_url = url
         session.head(old_url)  # to get the cookies
-        url = m.expand('\g<url>?getFile=\g<file>')
+        url = urljoin('https://otr.datenkeller.net/', m.expand('?getFile=\g<file>'))
+        print(url)
 
     if settings.DATENKELLER_USER and settings.DATENKELLER_PASSWORD:
         print('Trying to login at otr.datenkeller.net')
