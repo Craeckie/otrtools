@@ -188,7 +188,11 @@ def getTitles(
 
         last_page_li = b.find('li', { 'class': 'last'})
         if last_page_li:  # has any pages?
-            last_page_num = int(last_page_li.a.attrs['data-page']) + 1 # data-page is zero-based..
+            last_page_link = last_page_li.a.attrs['href']
+            m = re.search('page=([0-9]+)', last_page_link)
+            if not m:
+                print('Couldn\'t parse last page number from ' + last_page_link)
+            last_page_num = int(m.group(1))
             # print(f"Last page: {last_page_num}")
             first_page = min((page_start - 1)*page_num + 2, last_page_num)
             # print(f"last_page: {page_start} * {page_num} + 1")
