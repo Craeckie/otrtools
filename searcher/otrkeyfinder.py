@@ -76,8 +76,8 @@ def parseOtrkeys(otrkey_divs):
                     url = link.attrs['href']
 
                     mirror = {
-                      'name':     name,
-                      'link':     url,
+                      'name':     name.strip(),
+                      'link':     url.strip(),
                       'priority': settings.MIRROR_PRIORITIES.index(name) if name in settings.MIRROR_PRIORITIES else len(settings.MIRROR_PRIORITIES)
                     }
                 else:
@@ -86,7 +86,7 @@ def parseOtrkeys(otrkey_divs):
                     mirrors.append(mirror)
             if mirrors:
                 files.append({
-                    'file': file,
+                    'file': file.strip(),
                     'mirrors': sorted(mirrors, key=itemgetter('priority', 'name')),
                 })
         else:
@@ -180,9 +180,9 @@ def getTitles(
     if isFirstPage:
         key_names = loadKeys()
         last_page_num = 0
-        page_list = b.find('ul', {'class': 'pagination'})
-        if page_list: # has any pages?
-            last_page_li = b.find('li', { 'class': 'last'})
+
+        last_page_li = b.find('li', { 'class': 'last'})
+        if last_page_li:  # has any pages?
             last_page_num = int(last_page_li.a.attrs['data-page']) + 1 # data-page is zero-based..
             # print(f"Last page: {last_page_num}")
             first_page = min((page_start - 1)*page_num + 2, last_page_num)
