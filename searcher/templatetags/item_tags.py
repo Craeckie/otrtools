@@ -24,7 +24,7 @@ def format2label(f):
 
 @register.simple_tag
 def cutlist_call(item, i, num, destName=None, encodeTwice=False):
-    link = quote(item['chosen_mirror']['link'])
+    link = item['chosen_mirror']['link']
     return mark_safe('loadCutlists(%s)' % \
       ', '.join(map(lambda x: f"'{x}'",
         [
