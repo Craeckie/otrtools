@@ -69,3 +69,20 @@ class AddView(BaseView, FormView):
         initial['cutlist'] = self.request.GET.get("cutlist", "")
         initial['dest'] = self.request.GET.get("dest", "")
         return initial
+
+class DownloadsView(BaseView, TemplateView):
+    template_name = 'downloader/downloads.html'
+
+    def get_context_data(self, *args, **kwargs):
+        ctx = super().get_context_data(*args, **kwargs)
+        tasks_data = requests.get(f'http://{settings.FLOWER_HOST}/api/tasks')
+        tasks = tasks_data.json()
+        for task_id in tasks:
+            task = tasks[task_id]
+            if 'args' in task and 'kwargs' in task:
+                args = eval(task['args'])
+                # args = json.loads(args.replace('(', '[').replace(')', ']').replace("'", '"'))
+                kwargs = eval(task['kwargs'])
+                print(args + ", " + kwargs)
+        # print(tasks)
+        return ctx

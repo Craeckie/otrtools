@@ -20,6 +20,7 @@
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item{% if page == "add" %} active{% endif %}" href="{% url 'downloader:add' %}">Add Manually</a>
+            <a class="dropdown-item{% if page == "downloads" %} active{% endif %}" href="{% url 'downloader:downloads' %}">Show Downloads</a>
             <a class="dropdown-item" href="#">Show logs..</a>
             <div class="dropdown-divider"></div>
             <a class="dropdown-item" href="{% url 'admin:index' %}">Administration</a>
