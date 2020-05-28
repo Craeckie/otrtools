@@ -55,7 +55,7 @@ class AddView(BaseView, FormView):
         keep = form.cleaned_data.get("keep")
         # mega = form.cleaned_data.get("Mega", False)
         ctx = self.get_context_data(**kwargs)
-        if not startDownload(video, cutlist, dest, audio, keep, json=False):
+        if not startDownload(video, cutlist, dest, audio, keep):
             ctx['failed'] = True
 
         return HttpResponseRedirect(reverse('downloader:add'))  # render(self.request, 'downloader/add.html', ctx)
