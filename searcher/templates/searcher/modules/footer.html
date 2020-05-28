@@ -15,11 +15,16 @@
         row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
         row += '<td style="word-wrap: break-word">' + item.suggestedName + '</td>';
         row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
-        row += '<td><a target="_blank" class="text-success" href="{% url 'downloader:add' %}'
+        row += '<td><a target="_blank" class="text-information" href="{% url 'downloader:add' %}'
           + '?video=' + video_url
           + '&cutlist='  + cutlist_url
           + '&dest='  + destName
-          + '" title="Uses ' + mirror_name + '">Go!</a></td>';
+          + '" title="Uses ' + mirror_name + '">Add Manually</a></td>';
+        row += '<td><a target="_blank" class="btn btn-success" onclick="startDownload(this,'
+          + "'" + video_url + "','"
+          + cutlist_url + "','"
+          + destName
+          + '\');" title="Uses ' + mirror_name + '">Add</a></td>';
         row += '</tr>';
         items.push(row);
         found_cutlists = true;
@@ -37,4 +42,20 @@
       }
     });
   }
+  var btn = {};
+function startDownload(button, video, cutlist, dest) {
+  btn['btn'] = $(button);
+  let url = '{% url 'downloader:add-direct' %}'; // + video + '/' + cutlist + '/' + dest + '/';
+  $.post(url, {
+      'video': video,
+      'cutlist': cutlist,
+      'dest': dest
+  }, function(data) {
+    if (data.success == true) {
+        $(button).attr({'class': 'btn btn-info'}).html("Added").prop('disabled', true);
+    } else {
+        $(button).attr({'class': 'btn btn-warning'}).html("Failed :( Try again?");
+    }
+  });
+}
 </script>
