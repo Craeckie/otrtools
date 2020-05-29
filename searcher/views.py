@@ -39,7 +39,7 @@ def group_titles(titles):
     return res
 
 
-class MovieView(BaseView):
+class MovieView(BaseView, FormView):
     template_name = 'searcher/movies.html'
     form_class = MovieIndexForm
 
@@ -56,7 +56,7 @@ class MovieView(BaseView):
             page_num=max_page,
             min_dur=min_duration)
         grouped = group_titles(titles)
-        ctx = super().get_context_data(form=form, **kwargs)
+        ctx = self.get_context_data(form=form, **kwargs)
         ctx['new_titles'] = list(filter(lambda t: not t.isSimilarDecoded, grouped))
         ctx['old_titles'] = list(filter(lambda t: t.isSimilarDecoded, grouped))
 
@@ -76,6 +76,11 @@ class MovieView(BaseView):
                 return HttpResponseBadRequest("Invalid parameter!")
         else:
             return super().get(*args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(FormView, self).get_context_data(**kwargs)
+        ctx.update(super(MovieView, self).get_context_data(**kwargs))
+        return ctx
     # def request()
     # grouped = []
     # if request.method == 'POST':
@@ -104,6 +109,11 @@ class SeriesAddView(BaseView, FormView):
         # })
         messages.info(self.request, 'Added series')
         return HttpResponseRedirect(reverse('searcher:series')) #render(self.request, 'searcher/series.html', ctx)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(FormView, self).get_context_data(**kwargs)
+        ctx.update(super(SeriesAddView, self).get_context_data(**kwargs))
+        return ctx
 
 
 class SeriesView(BaseView, TemplateView):
@@ -134,7 +144,8 @@ class SeriesView(BaseView, TemplateView):
         return episodes
 
     def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
+        ctx = super(TemplateView, self).get_context_data(**kwargs)
+        ctx.update(super(SeriesView, self).get_context_data(**kwargs))
 
         ctx['serieslist'] = []
         for s in Series.objects.filter(hidden=False):

@@ -70,6 +70,11 @@ class AddView(BaseView, FormView):
         initial['dest'] = self.request.GET.get("dest", "")
         return initial
 
+    def get_context_data(self, **kwargs):
+        ctx = super(FormView, self).get_context_data(**kwargs)
+        ctx.update(super(AddView, self).get_context_data(**kwargs))
+        return ctx
+
 class DownloadsView(BaseView, TemplateView):
     template_name = 'downloader/downloads.html'
 
