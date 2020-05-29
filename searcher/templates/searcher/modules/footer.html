@@ -14,9 +14,14 @@
       });
       let items = []
       if (hasComment) {
-          items = ['<thead><th>Rating/<br />Downloads<br />Sug. Name</th><th>Comment</th><th>Actions</th></thead>']
+          items = ['<thead>' +
+          '<th style="width: 37.5%">Rating/<br />Downloads<br />Sug. Name</th>' +
+          '<th style="width: 37.5%">Comment</th>' +
+          '<th style="width: 25%">Actions</th></thead>']
       } else {
-          items = ['<thead><th>Rating/<br />Downloads<br />Sug. Name</th><th>Actions</th></thead>']
+          items = ['<thead>' +
+          '<th style="width: 70%">Rating/<br />Downloads<br />Sug. Name</th>' +
+          '<th style="width: 30%">Actions</th></thead>']
       }
       $.each(data.items, function (key, item) {
         cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;

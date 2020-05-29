@@ -5,14 +5,13 @@
 
     <div class="row{% if not forloop.first %} collapse collapse-{{ num }}{% endif %}" style="padding: 5px 0px 15px 0px;">
     {#<tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>#}
-      <div class="col-6 col-sm-4"><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ item.file }}&order=date-name"><span class="badge badge-{{ item.format|format2label }}">{{ item.format }}</span> {{ item.title }}</a></div>
-      <div class="col-4">{{ item.length }}</div>
-      <div class="col-4">{{ item.item_count }}</div>
+      <div class="col-9 col-lg-7"><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ item.file }}&order=date-name"><span class="badge badge-{{ item.format|format2label }}">{{ item.format }}</span> {{ item.title }}</a></div>
+      <div class="col-3 col-lg-5">{{ item.length }}</div>
     </div>
     <div class="row{% if not forloop.first %} collapse collapse-{{ num }}{% endif %}">
     {#<tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>#}
       <div class="col-md-3 col-lg-2 movie-links">
-        <table class="table">
+        <table class="table table-striped">
           {% for m in item.mirrors %}
           <tr>
             <td><a target="_blank" href="{{ m.link }}">{{ m.name }}</a></td>

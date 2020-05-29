@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'djcelery',
     'django_celery_results',
     'downloader',
+    'bootstrap4',
     'searcher',
     'crispy_forms',
     'django_icons',

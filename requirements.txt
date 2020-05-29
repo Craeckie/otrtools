@@ -3,12 +3,13 @@ anyjson
 bs4
 celery~=4.4.2
 Django~=3.0.6
+django-bootstrap4~=1.1.1
 django-celery
 django-celery-beat~=2.0.0
 django-celery-results~=1.2.1
 django-crispy-forms~=1.9.1
 git+https://github.com/sehmaschine/django-filebrowser@stable/3.13.x #django-filebrowser
-django-icons
+django-icons~=1.1.2
 flower~=0.9.4
 image~=1.5.32
 requests

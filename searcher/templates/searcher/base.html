@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en">
-<head>
+<head> {% load bootstrap4 %}
   {% block header %}
   {% endblock %}
 </head>
@@ -8,6 +8,7 @@
   {% block navbar %}
   {% endblock %}
   </br>
+  {% bootstrap_messages %}
   {% block content %}
   {% endblock %}
 

@@ -1,7 +1,10 @@
 # coding: utf-8
+from django.contrib import messages
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest
-from django.views.generic.edit import CreateView
+from django.http import HttpResponse, JsonResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic.base import View, TemplateView
+from django.views.generic.edit import CreateView, FormView
 import urllib.parse, requests
 from itertools import groupby
 from datetime import timedelta
@@ -82,10 +85,29 @@ class MovieView(BaseView):
     # else:
     #     form = MovieIndexForm()
 
-
-class SeriesView(BaseView):
-    template_name = 'searcher/series.html'
+class SeriesAddView(BaseView, FormView):
+    template_name = 'searcher/series-add.html'
     form_class = SeriesAddForm
+
+    def form_valid(self, form, **kwargs):
+        # url = form.cleaned_data.get("url")
+        # website = form.cleaned_data.get('website')
+        # series = form.cleaned_data.get("series")
+        # german = form.cleaned_data.get("german")
+        # otrNameFormat = form.cleaned_data.get("otrNameFormat")
+        form.save()
+        form.clean()
+
+        # ctx = self.get_context_data(**kwargs)
+        # ctx.update({
+        #     'form': form
+        # })
+        messages.info(self.request, 'Added series')
+        return HttpResponseRedirect(reverse('searcher:series')) #render(self.request, 'searcher/series.html', ctx)
+
+
+class SeriesView(BaseView, TemplateView):
+    template_name = 'searcher/series.html'
 
     def getEpisodeTitles(self, url, series, episode):
         # title = toOTRName(episode['title'])
@@ -96,20 +118,6 @@ class SeriesView(BaseView):
         episode['url'] = urllib.parse.urljoin(url, episode['url'])
         return episode
 
-    def form_valid(self, form, **kwargs):
-        url = form.cleaned_data.get("url")
-        website = form.cleaned_data.get('website')
-        series = form.cleaned_data.get("series")
-        german = form.cleaned_data.get("german")
-        otrNameFormat = form.cleaned_data.get("otrNameFormat")
-        form.save()
-        form.clean()
-
-        ctx = self.get_context_data(**kwargs)
-        ctx.update({
-            'form': form
-        })
-        return render(self.request, 'searcher/series.html', ctx)
 
     def get_season_episodes(self, series, season):
         url = series.url.format(season=season)
@@ -127,6 +135,7 @@ class SeriesView(BaseView):
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
+
         ctx['serieslist'] = []
         for s in Series.objects.filter(hidden=False):
             ctx['serieslist'].append((s, s._meta))

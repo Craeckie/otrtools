@@ -19,30 +19,33 @@
 {% block content %}
   <div class="container">
     <div class="row">
-      <div class="col-lg-12">
+      <div class="col-12">
         <h1>Series</h1>
       </div>
-      <div class="col-lg-6">
+      <div class="col-lg-10">
         <h3>Select a series</h3>
         <table class="table">
           <tbody>
+          <tr><td colspan="3">
+              <span class="text-success"> {% icon "plus" %} <a class="text-success" href="{% url 'searcher:series-add' %}">Add a Series</a></span>
+          </td></tr>
           {% for s, meta in serieslist %}
           <tr>
             <td><a target="_blank" href="{{ s.get_url }}">{{s.series}}</a></td>
-              <td>
+            <td>
+              <a
+                  class="btn btn-secondary btn-sm btn-season" type="button"
+                  href="{% url 'searcher:series' series=s.pk season=0 %}"
+                  data-toggle="tooltip" data-placement="top" title="All Seasons"
+              >All</a>
+              {% for i in s.get_season_range %}
                   <a
-                      class="btn btn-secondary btn-sm btn-season" type="button"
-                      href="{% url 'searcher:series' series=s.pk season=0 %}"
-                      data-toggle="tooltip" data-placement="top" title="All Seasons"
-                  >All</a>
-                  {% for i in s.get_season_range %}
-                      <a
-                          class="btn btn-secondary btn-sm btn-season " type="button"
-                          href="{% url 'searcher:series' series=s.pk season=i %}"
-                          data-toggle="tooltip" data-placement="top" title="Season {{ i }}"
-                      >{{ i }}</a>
-                  {% endfor %}
-              </td>
+                      class="btn btn-secondary btn-sm btn-season " type="button"
+                      href="{% url 'searcher:series' series=s.pk season=i %}"
+                      data-toggle="tooltip" data-placement="top" title="Season {{ i }}"
+                  >{{ i }}</a>
+              {% endfor %}
+            </td>
 {#            <td><select name="">#}
 {#              <option value="0">Select Episode</option>#}
 {#              <option value="-1" onclick="location.href='{% url 'searcher:series' series=s.pk season=0 %}';">All</option>#}
@@ -54,7 +57,7 @@
               class="btn btn-success btn-sm" type="button"
               href="{% url meta|admin_urlname:'change' s.pk %}"
               data-toggle="tooltip" data-placement="top" title="Edit"
-              >{% icon 'edit' %}</td>
+              >{% icon 'edit' %}</a></td>
           </tr>
           {% empty %}
           <tr>
@@ -63,18 +66,20 @@
           {% endfor %}
           </tbody>
         </table>
-        </div>
-      <div class="col-lg-6">
-        <h3>Add a new series</h3>
-        {% crispy form %}
       </div>
       <div class="col-lg-12 episode-list">
-        <table class="table table-striped">
+        {% if episodes %}
+        <h3>Episodes</h3>
+        {% endif %}
+        <table class="table table-striped table-dark">
+        <tr><td>
           {% for e in episodes %}
-            <tr class="episode-row">
-              <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a target="_blank" href="{{ e.url }}">{{ e.season }}x{{ e.episode }} {{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
+            <div class="row row-episode text-light">
+              <div class="col-sm-3 col-md-2 col-lg-2"><span style="font-size: 110%; font-weight: bold;{% if e.decoded %}text-decoration-line: line-through;{% endif %}">
+                  <a target="_blank" href="{{ e.url }}">{{ e.season }}x{{ e.episode }} {{ e.title }}</a>
+              </span></div>
               {% with e.otr as titles %}
-              <td>
+              <div class="col-11 offset-1 col-md-10 offset-md-0 col-lg-10">
                 <!--<table class="table table-striped text-light">-->
                 {% if titles %}
                     <!-- include items.html-->
@@ -84,10 +89,11 @@
                   <div class="row"><div class="col-12">No files found for this episode. <a target="_blank" href="https://otrkeyfinder.com/en/?search={{ e.search }}&order=date-name">Search</a> and <a target="_blank" href="{% url 'downloader:add' %}?dest={{ e.destName }}">add</a> manually.</div></div>
                 {% endif %}
                 <!--</table>-->
-              </td>
+              </div>
               {% endwith %}
-            </tr>
+            </div>
           {% endfor %}
+        </td></tr>
         </table>
       </div>
     </div>
