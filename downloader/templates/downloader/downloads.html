@@ -1,0 +1,38 @@
+{% extends 'searcher/base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block header %}
+  {% include 'searcher/modules/header.html' with title="Current Downloads" %}
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <!-- <link rel="stylesheet" href="{% static 'downloader/css/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'downloader/css/skeleton.css' %}"> -->
+{% endblock %}
+
+{% block navbar %}
+  {% include 'searcher/modules/navbar.html' with page="downloads" %}
+{% endblock %}
+{% block content %}
+<!-- Primary Page Layout
+–––––––––––––––––––––––––––––––––––––––––––––––––– -->
+<main class="container" role="main">
+  <div class="row">
+    <div class="col-md-8" style="margin-left: 30px; width: 85%; max-width: 650px;">
+      <h2>Current Downloads</h2>
+      <p></p>
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <span class="text-muted">Free space on server: ToDo</span>
+  </div>
+</footer>
+
+{% endblock %}
