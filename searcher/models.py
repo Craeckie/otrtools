@@ -13,6 +13,7 @@ class Series(models.Model):
     german = models.BooleanField()
     otrNameFormat = models.CharField(max_length=200, blank=True)
     numSeasons = models.IntegerField(default=1)
+    hidden = models.BooleanField(default=False)
 
     def get_season_range(self):
         return range(1, self.numSeasons + 1)
