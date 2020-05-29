@@ -128,7 +128,7 @@ class SeriesView(BaseView):
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx['serieslist'] = []
-        for s in Series.objects.all():
+        for s in Series.objects.filter(hidden=False):
             ctx['serieslist'].append((s, s._meta))
 
         if all(x in self.kwargs for x in ['series', 'season']):
