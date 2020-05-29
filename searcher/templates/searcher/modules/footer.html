@@ -4,9 +4,20 @@
   function loadCutlists(file_url, destName, video_url, mirror_name, table_id) {
     $(table_id).html("<tr><td>Loading..</td></tr>");
     $.getJSON(file_url, function(data) {
-      items = ['<thead><th>Rating/<br />Downloads<br />Sug. Name</th><th>Comment</th><th>Actions</th></thead>']
       //console.log(data.items)
       found_cutlists = false;
+      let hasComment = false;
+      $.each(data.items, function (key, item) {
+          if (item.comment) {
+              hasComment = true;
+          }
+      });
+      let items = []
+      if (hasComment) {
+          items = ['<thead><th>Rating/<br />Downloads<br />Sug. Name</th><th>Comment</th><th>Actions</th></thead>']
+      } else {
+          items = ['<thead><th>Rating/<br />Downloads<br />Sug. Name</th><th>Actions</th></thead>']
+      }
       $.each(data.items, function (key, item) {
         cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
         row = '<tr>';
@@ -16,8 +27,9 @@
             row += '<br />';
             row += '<div style="word-wrap: break-word">' + item.suggestedName + '</div>';
         row += '</td>';
-        row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
-
+        if (hasComment) {
+            row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
+        }
         row += '<td>';
             row += '<div style="margin-bottom: 5px;"><a target="_blank" class="btn btn-success" onclick="startDownload(this,'
               + "'" + decodeURI(video_url) + "','"

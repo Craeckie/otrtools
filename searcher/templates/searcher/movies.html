@@ -34,16 +34,18 @@
       </div>
     </div>
     {% if new_titles %}
+    <br />
     <div class="row">
-      <div class="mt-4">
+      <div class="col-md-12">
         <h2>Results</h2>
         {% include "searcher/modules/movie_titles.html" with titles=new_titles hide_cutlists=True %}
       </div>
     </div>
     {% endif %}
     {% if old_titles %}
+    <br />
     <div class="row">
-      <div class="mt-4">
+      <div class="col-md-12">
         <h2>Decoded Results</h2>
         {% include "searcher/modules/movie_titles.html" with titles=old_titles hide_cutlists=False %}
       </div>
