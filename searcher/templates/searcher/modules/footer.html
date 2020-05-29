@@ -4,27 +4,33 @@
   function loadCutlists(file_url, destName, video_url, mirror_name, table_id) {
     $(table_id).html("<tr><td>Loading..</td></tr>");
     $.getJSON(file_url, function(data) {
-      items = ['<thead><th>Rating</th><th>Downloads</th><th>Comment</th><th>Sug. Name</th><th>Link</th><th>Downloader</th></thead>']
+      items = ['<thead><th>Rating/<br />Downloads<br />Sug. Name</th><th>Comment</th><th>Actions</th></thead>']
       //console.log(data.items)
       found_cutlists = false;
       $.each(data.items, function (key, item) {
         cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
         row = '<tr>';
-        row += '<td><span class="text-info">' + item.rating.ratings + "x " + item.rating.avg + '</span></td>';
-        row += '<td>' + item.hits + '</td>';
+        row += '<td>';
+            row += '<div><span class="text-info">' + item.rating.ratings + "x " + item.rating.avg + '</span></div>';
+            row += '<div>' + item.hits + '</div>';
+            row += '<br />';
+            row += '<div style="word-wrap: break-word">' + item.suggestedName + '</div>';
+        row += '</td>';
         row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
-        row += '<td style="word-wrap: break-word">' + item.suggestedName + '</td>';
-        row += '<td><a target="_blank" href="' + cutlist_url + '">Link</a></td>';
-        row += '<td><a target="_blank" class="text-information" href="{% url 'downloader:add' %}'
-          + '?video=' + video_url
-          + '&cutlist='  + cutlist_url
-          + '&dest='  + destName
-          + '" title="Uses ' + mirror_name + '">Add Manually</a></td>';
-        row += '<td><a target="_blank" class="btn btn-success" onclick="startDownload(this,'
-          + "'" + decodeURI(video_url) + "','"
-          + cutlist_url + "','"
-          + destName
-          + '\');" title="Uses ' + mirror_name + '">Add</a></td>';
+
+        row += '<td>';
+            row += '<div style="margin-bottom: 5px;"><a target="_blank" class="btn btn-success" onclick="startDownload(this,'
+              + "'" + decodeURI(video_url) + "','"
+              + cutlist_url + "','"
+              + destName
+              + '\');" title="Uses ' + mirror_name + '">Add</a></div>';
+            row += '<div style="margin-bottom: 5px;"><a target="_blank" class="text-information" href="{% url 'downloader:add' %}'
+              + '?video=' + video_url
+              + '&cutlist='  + cutlist_url
+              + '&dest='  + destName
+              + '" title="Uses ' + mirror_name + '">Add Manually</a></div>';
+            row += '<div><a target="_blank" href="' + cutlist_url + '">Link</a></div>';
+        row += '</td>';
         row += '</tr>';
         items.push(row);
         found_cutlists = true;

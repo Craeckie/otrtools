@@ -12,10 +12,12 @@
         </table>
     </div></td>
     <td>
-      <table class="table table-striped text-light bg-dark">
+{#        <table class="table table-striped text-light bg-dark">#}
+        <!-- include items.html-->
         {% include "searcher/modules/items.html" with items=t.items num=forloop.counter %}
-      </table>
-    </tr>
-</tr></td>
+        <!-- end include items.html-->
+{#      </table>#}
+    </td>
+</tr>
 {% endfor %}
 </table>

@@ -1,46 +1,51 @@
 {% load item_tags %}
 
 {% for item in items %}
-<tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>
-  <td><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ item.file }}&order=date-name"><span class="badge badge-{{ item.format|format2label }}">{{ item.format }}</span> {{ item.title }}</a></td>
-  <td>{{ item.length }}</td>
-  <td>{{ item.item_count }}</td>
-</tr>
-<tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>
-  <td>
-    <table class="table">
-      {% for m in item.mirrors %}
-      <tr>
-        <td><a target="_blank" href="{{ m.link }}">{{ m.name }}</a></td>
-      </tr>
-      {% empty %}
-          No mirrors found! :(
-      {% endfor %}
-    </table>
-  </td>
-  <td>
-    <table style="table-layout: fixed; width: 100%" class="table text-light bg-dark" id="cutlist-table-{{ num }}-{{ forloop.counter }}">
-{#      {% if item.isDecoded or hide_cutlists %}#}
-        <tr><td><a href="javascript:{% cutlist_call item forloop.counter num destName True %}" class="text-success">Load cutlists</a></td></tr>
-{#      {% endif %}#}
-    </table>
-    <script>
-{#      {% if item.file_decrypted and forloop.first and not item.isDecoded and not hide_cutlists %}#}
-{#        {% cutlist_call item forloop.counter num destName %};#}
-      {% if not forloop.first %}
-        $('.collapse-{{ num }}:first').on('show.bs.collapse', function() {
-          $('#more-{{ num }}').remove();
+<div class="row movie-item" style="margin-bottom: 10px;"><div class="col-12">
 
-          {% cutlist_call item forloop.counter num destName %};
-        });
-      {% endif %}
-    </script>
+    <div class="row{% if not forloop.first %} collapse collapse-{{ num }}{% endif %}" style="padding: 5px 0px 15px 0px;">
+    {#<tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>#}
+      <div class="col-md-4"><a target="_blank" href="https://otrkeyfinder.com/en/?search={{ item.file }}&order=date-name"><span class="badge badge-{{ item.format|format2label }}">{{ item.format }}</span> {{ item.title }}</a></div>
+      <div class="col-md-4">{{ item.length }}</div>
+      <div class="col-md-4">{{ item.item_count }}</div>
+    </div>
+    <div class="row{% if not forloop.first %} collapse collapse-{{ num }}{% endif %}">
+    {#<tr{% if not forloop.first %} class="collapse collapse-{{ num }}"{% endif %}>#}
+      <div class="col-md-3">
+        <table class="table">
+          {% for m in item.mirrors %}
+          <tr>
+            <td><a target="_blank" href="{{ m.link }}">{{ m.name }}</a></td>
+          </tr>
+          {% empty %}
+              No mirrors found! :(
+          {% endfor %}
+        </table>
+      </div>
+      <div class="col-md-9">
+        <table style="table-layout: fixed; width: 100%" class="table text-light bg-dark" id="cutlist-table-{{ num }}-{{ forloop.counter }}">
+    {#      {% if item.isDecoded or hide_cutlists %}#}
+            <tr><td><a href="javascript:{% cutlist_call item forloop.counter num destName True %}" class="text-success">Load cutlists</a></td></tr>
+    {#      {% endif %}#}
+        </table>
+        <script>
+    {#      {% if item.file_decrypted and forloop.first and not item.isDecoded and not hide_cutlists %}#}
+    {#        {% cutlist_call item forloop.counter num destName %};#}
+          {% if not forloop.first %}
+            $('.collapse-{{ num }}:first').on('show.bs.collapse', function() {
+              $('#more-{{ num }}').remove();
 
-  </td>
-</tr>
-{% if forloop.first and items|length > 1 %}
-<tr id="more-{{ num }}">
-  <td><a class="btn btn-primary" data-toggle="collapse" data-target=".collapse-{{ num }}" role="button" aria-expanded="false" aria-controls="collapse-{{ num }}"> ({{ items|length|add:"-1" }}) More..</a></td>
-</tr>
-{% endif %}
+              {% cutlist_call item forloop.counter num destName %};
+            });
+          {% endif %}
+        </script>
+
+      </div>
+    </div>
+    {% if forloop.first and items|length > 1 %}
+    <div class="row" id="more-{{ num }}">
+      <div class="col-12"><a class="btn btn-primary" data-toggle="collapse" data-target=".collapse-{{ num }}" role="button" aria-expanded="false" aria-controls="collapse-{{ num }}"> ({{ items|length|add:"-1" }}) More..</a></div>
+    </div>
+    {% endif %}
+</div></div>
 {% endfor %}

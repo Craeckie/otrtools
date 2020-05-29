@@ -68,20 +68,22 @@
         <h3>Add a new series</h3>
         {% crispy form %}
       </div>
-      <div class="col-lg-12">
+      <div class="col-lg-12 episode-list">
         <table class="table table-striped">
           {% for e in episodes %}
-            <tr>
+            <tr class="episode-row">
               <td>{% if e.decoded %}<span style="text-decoration-line: line-through;">{% endif %}<a target="_blank" href="{{ e.url }}">{{ e.season }}x{{ e.episode }} {{ e.title }}</a>{% if e.decoded %}</span>{% endif %}</td>
               {% with e.otr as titles %}
               <td>
-                <table class="table table-striped text-light">
+                <!--<table class="table table-striped text-light">-->
                 {% if titles %}
+                    <!-- include items.html-->
                     {% include "searcher/modules/items.html" with items=titles num=forloop.counter destName=e.destName %}
+                    <!-- end include items.html-->
                 {% else %}
-                  <tr><td>No files found for this episode. <a target="_blank" href="https://otrkeyfinder.com/en/?search={{ e.search }}&order=date-name">Search</a> and <a target="_blank" href="{% url 'downloader:add' %}?dest={{ e.destName }}">add</a> manually.</td></tr>
+                  <div class="row"><div class="col-12">No files found for this episode. <a target="_blank" href="https://otrkeyfinder.com/en/?search={{ e.search }}&order=date-name">Search</a> and <a target="_blank" href="{% url 'downloader:add' %}?dest={{ e.destName }}">add</a> manually.</div></div>
                 {% endif %}
-                </table>
+                <!--</table>-->
               </td>
               {% endwith %}
             </tr>
