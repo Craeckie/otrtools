@@ -12,44 +12,73 @@
               hasComment = true;
           }
       });
-      let items = []
+      let item = '';
       if (hasComment) {
-          items = ['<thead>' +
+          item = '<thead>' +
           '<th style="width: 37.5%">Rating/<br />Downloads<br />Sug. Name</th>' +
           '<th style="width: 37.5%">Comment</th>' +
-          '<th style="width: 25%">Actions</th></thead>']
+          '<th style="width: 25%">Actions</th></thead>';
       } else {
-          items = ['<thead>' +
+          item = '<thead>' +
           '<th style="width: 70%">Rating/<br />Downloads<br />Sug. Name</th>' +
-          '<th style="width: 30%">Actions</th></thead>']
+          '<th style="width: 30%">Actions</th></thead>';
       }
+      let itemdiv = $($.parseHTML(item));
       $.each(data.items, function (key, item) {
         cutlist_url = 'http://www.cutlist.at/getfile.php?id=' + item.id;
-        row = '<tr>';
-        row += '<td>';
-            row += '<div><span class="text-info">' + item.rating.ratings + "x " + item.rating.avg + '</span></div>';
-            row += '<div>' + item.hits + '</div>';
-            row += '<br />';
-            row += '<div style="word-wrap: break-word">' + item.suggestedName + '</div>';
-        row += '</td>';
+        let row = $('<tr></tr>');
+        itemdiv.append(row);
+        let td = $('<td></td>');
+        row.append(td);
+        //row = '<tr>';
+        //row += '<td>';
+        td.append($('<div><span class="text-info">' + item.rating.ratings + "x " + item.rating.avg + '</span></div>'));;
+        td.append($('<div>' + item.hits + '</div>'));;
+        td.append($('<br />'));;
+        td.append($('<div style="word-wrap: break-word">' + item.suggestedName + '</div>'));;
+        //row += '</td>';
         if (hasComment) {
-            row += '<td style="word-wrap: break-word">' + item.comment + '</td>';
+            row.append($('<td style="word-wrap: break-word">' + item.comment + '</td>'));;
         }
-        row += '<td>';
-            row += '<div style="margin-bottom: 5px;"><a target="_blank" class="btn btn-success" onclick="startDownload(this,'
-              + "'" + decodeURI(video_url) + "','"
-              + cutlist_url + "','"
-              + destName
-              + '\');" title="Uses ' + mirror_name + '">Add</a></div>';
-            row += '<div style="margin-bottom: 5px;"><a target="_blank" class="text-information" href="{% url 'downloader:add' %}'
-              + '?video=' + encodeURIComponent(video_url)
-              + '&cutlist='  + encodeURIComponent(cutlist_url)
-              + '&dest='  + encodeURIComponent(destName)
-              + '" title="Uses ' + mirror_name + '">Add Manually</a></div>';
-            row += '<div><a target="_blank" href="' + cutlist_url + '">Link</a></div>';
-        row += '</td>';
-        row += '</tr>';
-        items.push(row);
+        //row += '<td>';
+        td = $('<td></td>');
+        row.append(td);
+        let linksdiv = $('<div style="margin-bottom: 5px;"></div>');
+        td.append(linksdiv);
+        let a = $('<a target="_blank" class="btn btn-success"></a>');
+        linksdiv.append(a);
+        let params = {
+            "video": video_url,
+            "cutlist": cutlist_url,
+            "dest": destName
+        };
+        a.attr({
+            'onclick': 'startDownload(this, ' + JSON.stringify(params) + ');',
+            'title': 'Uses ' + mirror_name
+        });
+        a.text('Add');
+            //row += '<div style="margin-bottom: 5px;"><a target="_blank" class="btn btn-success" onclick="startDownload(this,`
+              //+ "{\n"
+              //+ "video: " + video + ","
+              //+ "cutlist": cutlist,
+              //  "dest": dest,
+              //}+ decodeURI(video_url) + ","
+              //+ cutlist_url + "','"
+              //+ destName
+              //+ '\');" title="Uses ' + mirror_name + '">Add</a></div>';
+        linksdiv = $('<div style="margin-bottom: 5px;"></div>');
+        td.append(linksdiv);
+        a = $('<a target="_blank" class="text-information"></a>');
+        linksdiv.append(a);
+        a.attr({
+            'title': 'Uses ' + mirror_name,
+            'href': '{% url 'downloader:add' %}?' + $.param(params)
+        });
+        a.text('Add Manually');
+        td.append($('<div><a target="_blank" href="' + cutlist_url + '">Link</a></div>'));;
+        //row += '</td>';
+        //row += '</tr>';
+        //items.push(row);
         found_cutlists = true;
       });
       //console.log(items);
@@ -59,21 +88,36 @@
       //   }
       // }
       if (found_cutlists === true) {
-          $(table_id).html(items.join(""));
+          $(table_id).html(itemdiv);
       } else {
-          $(table_id).html('<tr><td>No cutlist found. <a target="_blank" href="{% url 'downloader:add' %}?video=' + video_url + '&dest=' + destName + '">Download without cutting?</a></td></tr>');
+          let tr = $('<tr></tr>');
+          let td = $('<td></td>');
+          tr.append(td);
+          let linksdiv = $('<div style="margin-bottom: 5px;">');
+          td.append('No cutlist found. ');
+          td.append(linksdiv);
+          let a = $('<a></a>');
+          linksdiv.append(a);
+          let params = {
+            "video": video_url,
+            "dest": destName
+        };
+        a.attr({
+            'target':  "_blank",
+            'class':   "btn btn-info",
+            'onclick': 'startDownload(this, ' + JSON.stringify(params) + ');',
+            'title':   'Uses ' + mirror_name
+        });
+        a.text('Add without cutting');
+        $(table_id).html(tr);
       }
     });
   }
   var btn = {};
-function startDownload(button, video, cutlist, dest) {
+function startDownload(button, params) {
   btn['btn'] = $(button);
   let url = '{% url 'downloader:add-direct' %}'; // + video + '/' + cutlist + '/' + dest + '/';
-  $.post(url, {
-      'video': video,
-      'cutlist': cutlist,
-      'dest': dest
-  }, function(data) {
+  $.post(url, params, function(data) {
     if (data.success == true) {
         $(button).attr({'class': 'btn btn-info'}).html("Added").prop('disabled', true);
     } else {
