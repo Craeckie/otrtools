@@ -42,9 +42,9 @@
               + destName
               + '\');" title="Uses ' + mirror_name + '">Add</a></div>';
             row += '<div style="margin-bottom: 5px;"><a target="_blank" class="text-information" href="{% url 'downloader:add' %}'
-              + '?video=' + video_url
-              + '&cutlist='  + cutlist_url
-              + '&dest='  + destName
+              + '?video=' + encodeURIComponent(video_url)
+              + '&cutlist='  + encodeURIComponent(cutlist_url)
+              + '&dest='  + encodeURIComponent(destName)
               + '" title="Uses ' + mirror_name + '">Add Manually</a></div>';
             row += '<div><a target="_blank" href="' + cutlist_url + '">Link</a></div>';
         row += '</td>';
