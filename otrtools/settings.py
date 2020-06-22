@@ -24,9 +24,9 @@ SECRET_KEY = os.environ.get('SECRET_KEY', default='pvw@df5r2*xi#b(boz)acdo6a#&qc
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', default=False)
 
-DOMAIN = os.environ.get("DOMAIN")
-if DOMAIN:
-    ALLOWED_HOSTS = [DOMAIN]
+DOMAINS = os.environ.get("DOMAINS")
+if DOMAINS:
+    ALLOWED_HOSTS = DOMAINS.split(',')
 else:
     ALLOWED_HOSTS = []
 
