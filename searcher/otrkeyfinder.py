@@ -53,6 +53,9 @@ def toOTRName(name):
     name = name \
       .replace(' ', '_') \
       .replace('&', ' ') \
+      .replace('ä', '__') \
+      .replace('ö', '__') \
+      .replace('ü', '__') \
       .replace(':', ' ') \
       .replace('.', '_') \
       .replace('\'', '_') \
