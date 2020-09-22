@@ -198,11 +198,11 @@ def getTitles(
                 print('Couldn\'t parse last page number from ' + last_page_link)
             last_page_num = int(m.group(1))
             # print(f"Last page: {last_page_num}")
-            first_page = min((page_start - 1)*page_num + 2, last_page_num)
+            first_page = min(page_start, last_page_num)
             # print(f"last_page: {page_start} * {page_num} + 1")
-            last_page = min(page_start * page_num + 1, last_page_num + 1)
+            last_page = min(page_start + page_num - 1, last_page_num + 1)
             # print(f"Page range: {first_page} -> {last_page}")
-            pages = range(first_page, last_page)
+            pages = range(first_page, last_page + 1)
             with Pool(4) as p:
               titles.extend(chain.from_iterable(p.starmap(getTitles, zip(
                   repeat(search.lower()),
