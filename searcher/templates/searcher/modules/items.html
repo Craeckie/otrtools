@@ -22,8 +22,8 @@
         </table>
       </div>
       <div class="col-md-9 col-lg-9 movie-cutlists">
-        {% with "cutlist-table-{{ prefix }}-{{ num }}-{{ forloop.counter }}" as cutlist_table_id %}
-        <table style="table-layout: fixed; width: 100%" class="table text-light bg-dark" id="cutlist_table_id">
+        {% concat "cutlist-table" prefix "-" num "-" forloop.counter as cutlist_table_id %}
+        <table style="table-layout: fixed; width: 100%" class="table text-light bg-dark" id="{{ cutlist_table_id }}">
             <tr><td><a href="javascript:{% cutlist_call item cutlist_table_id destName True %}" class="text-success">Load cutlists</a></td></tr>
         </table>
         <script>
@@ -35,7 +35,6 @@
             });
           {% endif %}
         </script>
-        {% endwith %}
 
       </div>
     </div>

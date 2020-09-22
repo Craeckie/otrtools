@@ -37,3 +37,7 @@ def cutlist_call(item, cutlist_table_id, destName=None, encodeTwice=False):
       # "{{ item.chosen_mirror.link|urlencode }}",
       # "{{ item.chosen_mirror.name }}",
       # "#cutlist-table-{{ num }}-{{ forloop.counter }}");"
+
+@register.simple_tag
+def concat(*args):
+    return ''.join([str(a) for a in args])
