@@ -23,7 +23,7 @@ def format2label(f):
       return None
 
 @register.simple_tag
-def cutlist_call(item, i, num, destName=None, encodeTwice=False):
+def cutlist_call(item, cutlist_table_id, destName=None, encodeTwice=False):
     link = item['chosen_mirror']['link']
     return mark_safe('loadCutlists(%s)' % \
       ', '.join(map(lambda x: f"'{x}'",
@@ -32,7 +32,7 @@ def cutlist_call(item, i, num, destName=None, encodeTwice=False):
           escapejs(destName) if destName else '',
           quote(link) if encodeTwice else link,
           item['chosen_mirror']['name'],
-          f'#cutlist-table-{num}-{i}',
+          f'#{cutlist_table_id}',
         ])))
       # "{{ item.chosen_mirror.link|urlencode }}",
       # "{{ item.chosen_mirror.name }}",

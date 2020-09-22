@@ -22,22 +22,20 @@
         </table>
       </div>
       <div class="col-md-9 col-lg-9 movie-cutlists">
-        <table style="table-layout: fixed; width: 100%" class="table text-light bg-dark" id="cutlist-table-{{ num }}-{{ forloop.counter }}">
-    {#      {% if item.isDecoded or hide_cutlists %}#}
-            <tr><td><a href="javascript:{% cutlist_call item forloop.counter num destName True %}" class="text-success">Load cutlists</a></td></tr>
-    {#      {% endif %}#}
+        {% with "cutlist-table-{{ prefix }}-{{ num }}-{{ forloop.counter }}" as cutlist_table_id %}
+        <table style="table-layout: fixed; width: 100%" class="table text-light bg-dark" id="cutlist_table_id">
+            <tr><td><a href="javascript:{% cutlist_call item cutlist_table_id destName True %}" class="text-success">Load cutlists</a></td></tr>
         </table>
         <script>
-    {#      {% if item.file_decrypted and forloop.first and not item.isDecoded and not hide_cutlists %}#}
-    {#        {% cutlist_call item forloop.counter num destName %};#}
           {% if not forloop.first %}
             $('.collapse-{{ num }}:first').on('show.bs.collapse', function() {
               $('#more-{{ num }}').remove();
 
-              {% cutlist_call item forloop.counter num destName %};
+              {% cutlist_call item cutlist_table_id destName %};
             });
           {% endif %}
         </script>
+        {% endwith %}
 
       </div>
     </div>

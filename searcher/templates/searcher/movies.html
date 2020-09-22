@@ -38,7 +38,7 @@
     <div class="row">
       <div class="col-md-12">
         <h2>Results</h2>
-        {% include "searcher/modules/movie_titles.html" with titles=new_titles hide_cutlists=True %}
+        {% include "searcher/modules/movie_titles.html" with titles=new_titles js_prefix="undecoded_" %}
       </div>
     </div>
     {% endif %}
@@ -47,7 +47,7 @@
     <div class="row">
       <div class="col-md-12">
         <h2>Decoded Results</h2>
-        {% include "searcher/modules/movie_titles.html" with titles=old_titles hide_cutlists=False %}
+        {% include "searcher/modules/movie_titles.html" with titles=old_titles js_prefix="decoded_"%}
       </div>
     </div>
     {% endif %}

@@ -15,7 +15,7 @@
     <div class="col-11 offset-1 col-sm-9 offset-sm-0 col-lg-10">
 {#        <table class="table table-striped text-light bg-dark">#}
         <!-- include items.html-->
-        {% include "searcher/modules/items.html" with items=t.items num=forloop.counter %}
+        {% include "searcher/modules/items.html" with items=t.items num=forloop.counter prefix=prefix %}
         <!-- end include items.html-->
 {#      </table>#}
     </div>
