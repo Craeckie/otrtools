@@ -1,7 +1,7 @@
 ## The following requirements were added by pip freeze:
 anyjson
 bs4
-celery~=4.4.2
+celery==5.1.2
 Django==3.2.7
 django-bootstrap4==3.0.1
 django-celery
