@@ -28,7 +28,7 @@ DOMAINS = os.environ.get("DOMAINS")
 if DOMAINS:
     ALLOWED_HOSTS = DOMAINS.split(',')
 else:
-    ALLOWED_HOSTS = []
+    ALLOWED_HOSTS = ['127.0.0.1']
 
 # Application definition
 
@@ -159,12 +159,10 @@ DATENKELLER_USER = os.environ.get('DATENKELLER_USER')
 DATENKELLER_PASSWORD = os.environ.get('DATENKELLER_PASSWORD')
 
 # Decryption
-OTRKEY_CACHE = os.path.join(os.environ['HOME'], ".otrkey_cache")
+OTRKEY_CACHE = os.environ.get('OTRKEY_CACHE', os.path.join(os.environ['HOME'], ".otrkey_cache"))
 
 OTR_USERNAME = os.environ.get('OTR_USERNAME')
 OTR_PASSWORD = os.environ.get('OTR_PASSWORD')
-
-OTRKEY_CACHE = os.environ.get('OTRKEY_CACHE')
 
 DEST_DIR = os.environ.get("DEST_DIR")
 
@@ -198,6 +196,8 @@ DJANGO_ICONS = {
 
 # Logging
 LOG_DIR = os.path.join(WWW_DIR, 'logs/')
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Production settings (keep at the end)
 PRODUCTION_SETTINGS_PATH = os.path.join(os.path.dirname(__file__), "production.py")
