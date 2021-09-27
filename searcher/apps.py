@@ -1,5 +1,5 @@
-from django.apps import AppConfig
+#from django.apps import AppConfig
 
 
-class FinderConfig(AppConfig):
-    name = 'finder'
+# class FinderConfig(AppConfig):
+#     name = 'finder'

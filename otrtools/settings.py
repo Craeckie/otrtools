@@ -188,6 +188,14 @@ MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(WWW_DIR, 'www/'))
 DEST_CHOWN_USER, DEST_CHOWN_GROUP = os.environ.get('DEST_CHOWN_USER'), os.environ.get('DEST_CHOWN_GROUP')
 DEST_CHMOD = os.environ.get('DEST_CHMOD')
 
+# Icons
+DJANGO_ICONS = {
+    "ICONS": {
+        "add": {"name": "fas fa-plus"},
+        "edit": {"name": "fas fa-edit"},
+    },
+}
+
 # Logging
 LOG_DIR = os.path.join(WWW_DIR, 'logs/')
 
