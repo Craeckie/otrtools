@@ -91,7 +91,7 @@ echo -e "\n\n"
 # git clone --depth 1 git://source.ffmpeg.org/ffmpeg.git ffmpeg
 mkdir ffmpeg
 pushd ffmpeg
-wget -q -O ffmpeg.tar.xz http://ffmpeg.org/releases/ffmpeg-4.0.2.tar.xz
+wget -q -O ffmpeg.tar.xz http://ffmpeg.org/releases/ffmpeg-4.4.tar.xz
 tar xf ffmpeg.tar.xz --strip-components 1
 
 #sed -e '/UPD.*=/,/SET_SCA.*=/d' \
