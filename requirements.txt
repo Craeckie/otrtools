@@ -11,6 +11,7 @@ django-filebrowser
 django-icons==4.0.0
 flower==1.0.0
 image~=1.5.32
+redis~=4.1.0
 requests~=2.26.0
 urllib3==1.26.7
 uwsgi
