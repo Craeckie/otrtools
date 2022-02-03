@@ -1,21 +1,13 @@
-import json
-from ast import literal_eval
-
 import requests
-from celery.app import control
-from celery.app.control import Control, Inspect
 from django.conf import settings
-from django.shortcuts import render
 from django.http import HttpResponseRedirect, JsonResponse
 from django.urls import reverse
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic import FormView, ListView, TemplateView
+from django.views.generic import FormView, TemplateView
 
-from otrtools.celery import app
 from otrtools.views import BaseView
-from .process import process
 from .forms import AddForm
+from .process import process
 
 session = requests.session()
 
@@ -38,13 +30,14 @@ def startRequest(request):
             'success': False,
             'message': message
         })
-    return
+
 
 def startDownload(video, cutlist, dest, audio=None, keep=False):
     if audio:
         return process.delay(video, cutlist, session, audio_url=audio, destName=dest, keep=keep)
     else:
         return process.delay(video, cutlist, session, destName=dest, keep=keep)
+
 
 class AddView(BaseView, FormView):
     template_name = 'downloader/add.html'
@@ -63,7 +56,6 @@ class AddView(BaseView, FormView):
 
         return HttpResponseRedirect(reverse('downloader:add'))  # render(self.request, 'downloader/add.html', ctx)
 
-
     def get_initial(self):
         initial = super().get_initial()
 
@@ -77,6 +69,7 @@ class AddView(BaseView, FormView):
         ctx = super(FormView, self).get_context_data(**kwargs)
         ctx.update(super(AddView, self).get_context_data(**kwargs))
         return ctx
+
 
 class DownloadsView(BaseView, TemplateView):
     template_name = 'downloader/downloads.html'
