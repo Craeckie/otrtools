@@ -118,8 +118,8 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-import djcelery
-djcelery.setup_loader()
+#import djcelery
+#djcelery.setup_loader()
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -167,7 +167,7 @@ OTR_PASSWORD = os.environ.get('OTR_PASSWORD')
 DEST_DIR = os.environ.get("DEST_DIR")
 
 CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "amqp://guest:guest@localhost:5672//")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "amqp://guest:guest@localhost:5672//")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", "rpc://guest:guest@localhost:5672//")
 
 FLOWER_HOST = os.environ.get("FLOWER_HOST", "localhost:5555")
 

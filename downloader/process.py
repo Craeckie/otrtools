@@ -42,7 +42,7 @@ class MediaInformation:
         return getDecryptedName(otrkey)
 
 
-@app.task()
+@app.task(bind=True)
 def process(video_url, cutlist, session, audio_url=None, destName=None, keep=False, tryCount=0):
     restart_args = {
         'video_url': video_url,

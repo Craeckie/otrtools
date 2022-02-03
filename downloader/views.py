@@ -41,7 +41,10 @@ def startRequest(request):
     return
 
 def startDownload(video, cutlist, dest, audio=None, keep=False):
-    return process.delay(video, cutlist, session, audio_url=audio, destName=dest, keep=keep)
+    if audio:
+        return process.delay(video, cutlist, session, audio_url=audio, destName=dest, keep=keep)
+    else:
+        return process.delay(video, cutlist, session, destName=dest, keep=keep)
 
 class AddView(BaseView, FormView):
     template_name = 'downloader/add.html'
