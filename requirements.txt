@@ -9,7 +9,7 @@ django-bootstrap4==3.0.1
 django-crispy-forms==1.13.0
 django-filebrowser
 django-icons==4.0.0
-flower==1.0.0
+flower==1.2.0
 image~=1.5.32
 redis~=4.1.0
 requests~=2.26.0
